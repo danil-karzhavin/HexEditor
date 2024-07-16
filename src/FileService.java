@@ -1,3 +1,4 @@
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -16,13 +17,16 @@ public class FileService {
     private String contentHex = "";
 
     // массив символов на основе массива байтов content
-    private char[] contentChar = new char[0];
+    private String contentChar;
 
     public FileService(String path){
         setPath(path);
     }
 
     private void setPath(String path){
+        if (path == null){
+            // throw exception
+        }
         this.path = path;
     }
 
@@ -81,14 +85,17 @@ public class FileService {
         return hex.toUpperCase();  // Приводим к верхнему регистру для единства стиля
     }
 
-    public char[] getCharContent(){
-        if (contentChar.length == 0){
+    public String getCharContent(){
+        if (contentChar == null){
             getContent();
 
-            contentChar = new char[content.length];
+            ArrayList<Character> tmp = new ArrayList<Character>();
             for(int i = 0; i < content.length; ++i){
-                contentChar[i] = (char) (content[i] & 0xFF);
+                tmp.add(i, (char) (content[i] & 0xFF));
             }
+            Optional<String> res = tmp.stream().map(ch -> Character.toString(ch)).reduce((a, b) -> a + " " + b);
+            contentChar = res.get();
+            System.out.println(contentChar);
         }
         return contentChar;
     }
