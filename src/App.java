@@ -1,14 +1,14 @@
 import javax.swing.*;
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 public class App extends JFrame {
     public JMenuBar jmenuBar;
     public MenuBar menuBar;
-    public JTextArea hexArea, charArea;
+    public HexAreaComponent hexArea;
+    public JTextArea charArea;
     JPanel panel;
-    FileService fs;
+    // FileService fs = null;
     DialogExitComponent dialogExitComp;
 
     public static void main(String[] args) {
@@ -34,8 +34,13 @@ public class App extends JFrame {
             public void windowDeactivated(WindowEvent e) { }
             @Override
             public void windowClosing(WindowEvent event) {
-                dialogExitComp = new DialogExitComponent("Выход");
-                dialogExitComp.createDialogFrame();
+                if((hexArea.getFileService() == null) || (hexArea.getJtextArea().getText() == hexArea.getFileService().getStringContent()) || hexArea.getJtextArea().getText().length() == 0){
+                    System.exit(0);
+                }
+                else {
+                    dialogExitComp = new DialogExitComponent(App.this);
+                    dialogExitComp.createDialogFrame("Выход");
+                }
             }
         });
 
@@ -52,14 +57,13 @@ public class App extends JFrame {
         ///////////////////////////////////////////////////////////////////////////////////////////
 
         panel = new JPanel();
-        //////////////////////////////////////// JTextField ////////////////////////////////////////
-        hexArea = new JTextArea("Hex Area", 20, 50);
-        TextFieldHexChar.getFormatTextHexComponent(hexArea);
+        //////////////////////////////////////// JTextArea ////////////////////////////////////////
+        hexArea = new HexAreaComponent(this);
 
-        charArea = new JTextArea("Char Area", 20, 50);
-        TextFieldHexChar.getFormatTextCharComponent(charArea);
-        panel.add(new JScrollPane(hexArea));
-        panel.add(new JScrollPane(charArea));
+
+        //charArea =
+        panel.add(hexArea.getScrollPaneComponent());
+        //panel.add(new JScrollPane(charArea));
         ///////////////////////////////////////////////////////////////////////////////////////////
         setContentPane(panel);
 

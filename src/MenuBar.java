@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class MenuBar extends JFrame {
     App app;
@@ -43,10 +44,16 @@ public class MenuBar extends JFrame {
                     path = fileChooser.getSelectedFile().getAbsolutePath(); // need call back
 
 
-                app.fs = new FileService(path);
-                app.hexArea.setText(app.fs.getStringContent());
-                app.charArea.setText(app.fs.getCharContent());
-                System.out.print(app.fs.getCharContent());
+                app.hexArea.createFileService(path);
+//              app.hexArea.getJtextArea().setText(app.fs.getStringContent());
+//              app.charArea.setText(app.fs.getCharContent());
+//              System.out.print(app.fs.getCharContent());
+                try{
+                    app.hexArea.loadMoreContent();
+                }
+                catch (IOException ex){
+                    ex.printStackTrace();
+                }
             }
         });
 

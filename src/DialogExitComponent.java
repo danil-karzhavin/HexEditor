@@ -3,16 +3,19 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class DialogExitComponent extends JDialog {
+    App app;
     JButton buttonSave, buttonExit;
     String title;
     JPanel panel;
 
-    public DialogExitComponent(String title){
-        this.title = title;
+    public DialogExitComponent(App app){
+        this.app = app;
     }
 
-    public JDialog createDialogFrame()
+    public JDialog createDialogFrame(String title)
     {
+        this.title = title;
+
         JDialog dialog = new JDialog(this, title, true);
         dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         dialog.setSize(400, 200);
@@ -23,8 +26,8 @@ public class DialogExitComponent extends JDialog {
         buttonSave.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 // saving functionality
+                //app.fs.SetContent();
                 System.exit(0);
-                // dialog.dispose();
             }
         });
 

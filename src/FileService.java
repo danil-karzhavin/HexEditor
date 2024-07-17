@@ -1,11 +1,6 @@
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class FileService {
     public String path;
@@ -19,8 +14,16 @@ public class FileService {
     // массив символов на основе массива байтов content
     private String contentChar;
 
+    // размер буфера
+    public final int BUFFER_SIZE = 4096;
+    // размер буфера
+    byte[] buffer = null;
+
+    RandomAccessFile randomAccessFile;
+
     public FileService(String path){
         setPath(path);
+        largeFileReader();
     }
 
     private void setPath(String path){
@@ -117,4 +120,29 @@ public class FileService {
             System.out.println(ex2.getMessage());
         }
     }
+    /////// new methods
+        public void largeFileReader(){
+            try{
+                this.randomAccessFile = new RandomAccessFile(path, "r");
+            }
+            catch (FileNotFoundException ex) {
+                System.out.println("Файл не найден: " + ex.getMessage());
+            }
+        }
+
+        public String readBlock(long position) throws IOException{
+            buffer = new byte[BUFFER_SIZE];
+            randomAccessFile.seek(position);
+            int bytesRead = randomAccessFile.read(buffer);
+            if (bytesRead == -1)
+                return "";
+            return new String(buffer, 0, bytesRead);
+        }
+        public long length() throws IOException {
+            return randomAccessFile.length();
+        }
+
+        public void close() throws IOException {
+            randomAccessFile.close();
+        }
 }
