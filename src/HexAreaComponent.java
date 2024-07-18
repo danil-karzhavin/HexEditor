@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import java.io.File;
 import java.io.IOException;
 
 public class HexAreaComponent {
@@ -11,7 +10,8 @@ public class HexAreaComponent {
     JScrollPane scrollPane = null;
     App parentObj;
     private final int THRESHOLD = 100;
-    long currentPos = 0;
+    int currentPos = 0;
+    Boolean eraseEnableandWasRun = false;
     private static final int LOAD_DELAY_MS = 200; // Задержка между загрузками в миллисекундах
     // Таймер для задержки загрузки
     private Timer loadTimer;
@@ -35,21 +35,42 @@ public class HexAreaComponent {
         scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
-                if (e.getValueIsAdjusting()) {
+                if (!e.getValueIsAdjusting()) {
                     JScrollBar scrollbar = (JScrollBar) e.getSource();
-                    int max = scrollbar.getMaximum();
+                    int max = scrollbar.getModel().getMaximum();
+
+                    // Возвращает размер окна отображаемой части из всего содержимого (величина видимой части прокручиваемого содержимого)
                     int extent = scrollbar.getModel().getExtent();
-                    int value = scrollbar.getValue();
-                    if (max - (value + extent) <= THRESHOLD) {
-                        try {
-                            if (currentPos < fs.length()){
-                                loadMoreContent();
-                                erasePrevContent();
-                                System.out.println(value);
+                    int value = scrollbar.getModel().getValue();
+//                    if (max - (value + extent) <= THRESHOLD) {
+                    if (fs != null) {
+                        if (((max - extent) == value)) {
+                            System.out.print(scrollbar.getValue());
+                            try {
+                                if (currentPos < fs.length()) {
+                                    loadNextContent();
+                                    if (eraseEnableandWasRun)
+                                        erasePrevContent();
+                                    eraseEnableandWasRun = true;
+
+
+                                    scrollPane.revalidate();
+                                    scrollPane.repaint();
+
+                                }
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
                             }
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
                         }
+//                        if ((scrollbar.getValue() == scrollbar.getMinimum()) && eraseEnableandWasRun && currentPos != 0) {
+//                            System.out.print(scrollbar.getValue());
+//                            try {
+//                                loadPrevContent();
+//                                eraseEndContent();
+//                            } catch (IOException ex) {
+//                                ex.printStackTrace();
+//                            }
+//                        }
                     }
                 }
             }
@@ -58,15 +79,29 @@ public class HexAreaComponent {
         return scrollPane;
     }
 
-    public void loadMoreContent() throws IOException {
+    public void loadNextContent() throws IOException {
         String content = fs.readBlock(currentPos);
         currentPos += fs.BUFFER_SIZE;
         area.append(content);
-        System.out.println("loadMoreContent() called");
+        // System.out.println("loadMoreContent() called");
     }
     public void erasePrevContent() throws IOException{
         area.replaceRange("", 0, fs.BUFFER_SIZE);
-        System.out.println("erasePrevContent() called");
+        // System.out.println("erasePrevContent() called");
+    }
+
+    public void loadPrevContent() throws IOException{
+        //currentPos -= 2 * fs.BUFFER_SIZE;
+        int pos = currentPos - 2 * fs.BUFFER_SIZE >= 0 ? currentPos - 2 * fs.BUFFER_SIZE : 0;
+        String content = fs.readBlock(pos);
+        area.insert(content, 0);
+        System.out.println("loadPrevContent() called");
+    }
+
+    public void eraseEndContent() throws IOException{
+        currentPos = currentPos - fs.BUFFER_SIZE >= 0 ? currentPos - fs.BUFFER_SIZE : 0;
+        area.replaceRange("", currentPos, fs.BUFFER_SIZE);
+        System.out.println("eraseEndContent() called");
     }
 
     public JTextArea getJtextArea(){

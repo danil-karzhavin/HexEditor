@@ -49,7 +49,7 @@ public class MenuBar extends JFrame {
 //              app.charArea.setText(app.fs.getCharContent());
 //              System.out.print(app.fs.getCharContent());
                 try{
-                    app.hexArea.loadMoreContent();
+                    app.hexArea.loadNextContent();
                 }
                 catch (IOException ex){
                     ex.printStackTrace();
