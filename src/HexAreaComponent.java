@@ -9,12 +9,12 @@ public class HexAreaComponent {
     JTextArea area = null;
     JScrollPane scrollPane = null;
     App parentObj;
-    private final int THRESHOLD = 100;
+    // размер буфера
+    public final int BUFFER_SIZE = 2048;
     int currentPos = 0;
     Boolean eraseEnableandWasRun = false;
-    private static final int LOAD_DELAY_MS = 200; // Задержка между загрузками в миллисекундах
-    // Таймер для задержки загрузки
-    private Timer loadTimer;
+    int pos = 1;
+
     HexAreaComponent(App parentObj){
         this.parentObj = parentObj;
         area = new JTextArea("Hex area", 20, 50);
@@ -37,71 +37,77 @@ public class HexAreaComponent {
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 if (!e.getValueIsAdjusting()) {
                     JScrollBar scrollbar = (JScrollBar) e.getSource();
-                    int max = scrollbar.getModel().getMaximum();
 
+                    int max = scrollbar.getModel().getMaximum();
                     // Возвращает размер окна отображаемой части из всего содержимого (величина видимой части прокручиваемого содержимого)
                     int extent = scrollbar.getModel().getExtent();
                     int value = scrollbar.getModel().getValue();
-//                    if (max - (value + extent) <= THRESHOLD) {
+
                     if (fs != null) {
                         if (((max - extent) == value)) {
-                            System.out.print(scrollbar.getValue());
                             try {
+                                pos = 1;
                                 if (currentPos < fs.length()) {
                                     loadNextContent();
-                                    if (eraseEnableandWasRun)
+                                    if (eraseEnableandWasRun) {
                                         erasePrevContent();
+                                    }
                                     eraseEnableandWasRun = true;
-
-
-                                    scrollPane.revalidate();
-                                    scrollPane.repaint();
-
                                 }
                             } catch (IOException ex) {
                                 ex.printStackTrace();
                             }
                         }
-//                        if ((scrollbar.getValue() == scrollbar.getMinimum()) && eraseEnableandWasRun && currentPos != 0) {
-//                            System.out.print(scrollbar.getValue());
-//                            try {
-//                                loadPrevContent();
-//                                eraseEndContent();
-//                            } catch (IOException ex) {
-//                                ex.printStackTrace();
-//                            }
-//                        }
+                        if ((scrollbar.getValue() == scrollbar.getMinimum()) && eraseEnableandWasRun && currentPos != 0) {
+                            System.out.print(scrollbar.getValue());
+                            try {
+                                // если pos = 0, значит достигли начала файла
+                                if (pos > 0) {
+                                    loadPrevContent();
+
+                                    currentPos = currentPos - BUFFER_SIZE >= 0 ? currentPos - BUFFER_SIZE : 0;
+                                    eraseEndContent();
+                                }
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
                     }
                 }
             }
         });
-
         return scrollPane;
     }
-
+    // ok
     public void loadNextContent() throws IOException {
-        String content = fs.readBlock(currentPos);
-        currentPos += fs.BUFFER_SIZE;
+        String content = fs.readBlock(currentPos, BUFFER_SIZE);
+        currentPos += content.length();
         area.append(content);
-        // System.out.println("loadMoreContent() called");
+        System.out.println("loadMoreContent() called");
     }
+
+    // ok
     public void erasePrevContent() throws IOException{
-        area.replaceRange("", 0, fs.BUFFER_SIZE);
-        // System.out.println("erasePrevContent() called");
+        area.replaceRange("", 0, BUFFER_SIZE);
+        area.setCaretPosition(area.getText().length() - BUFFER_SIZE);
+        //System.out.println("erasePrevContent() called");
     }
 
+    // ok
     public void loadPrevContent() throws IOException{
-        //currentPos -= 2 * fs.BUFFER_SIZE;
-        int pos = currentPos - 2 * fs.BUFFER_SIZE >= 0 ? currentPos - 2 * fs.BUFFER_SIZE : 0;
-        String content = fs.readBlock(pos);
+        int sizeArea = area.getText().length();
+        pos = (currentPos - (BUFFER_SIZE + sizeArea)) >= 0 ? (currentPos - (BUFFER_SIZE + sizeArea)) : 0;
+        String content = fs.readBlock(pos, BUFFER_SIZE);
         area.insert(content, 0);
-        System.out.println("loadPrevContent() called");
+        //System.out.println("loadPrevContent() called");
     }
 
+    // ok
     public void eraseEndContent() throws IOException{
-        currentPos = currentPos - fs.BUFFER_SIZE >= 0 ? currentPos - fs.BUFFER_SIZE : 0;
-        area.replaceRange("", currentPos, fs.BUFFER_SIZE);
-        System.out.println("eraseEndContent() called");
+        int sizeArea = area.getText().length();
+        area.replaceRange("", area.getText().length() - BUFFER_SIZE, sizeArea);
+        area.setCaretPosition(area.getText().length() - 10);
+        //System.out.println("eraseEndContent() called");
     }
 
     public JTextArea getJtextArea(){

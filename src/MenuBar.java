@@ -45,11 +45,9 @@ public class MenuBar extends JFrame {
 
 
                 app.hexArea.createFileService(path);
-//              app.hexArea.getJtextArea().setText(app.fs.getStringContent());
-//              app.charArea.setText(app.fs.getCharContent());
-//              System.out.print(app.fs.getCharContent());
                 try{
                     app.hexArea.loadNextContent();
+                    app.hexArea.area.replaceRange("", 0, 8); // тупой костыль
                 }
                 catch (IOException ex){
                     ex.printStackTrace();

@@ -15,8 +15,6 @@ public class FileService {
     private String contentChar;
 
     // размер буфера
-    public final int BUFFER_SIZE = 4096;
-    // размер буфера
     byte[] buffer = null;
 
     RandomAccessFile randomAccessFile;
@@ -130,8 +128,8 @@ public class FileService {
             }
         }
 
-        public String readBlock(long position) throws IOException{
-            buffer = new byte[BUFFER_SIZE];
+        public String readBlock(long position, int buffer_size) throws IOException{
+            buffer = new byte[buffer_size];
             randomAccessFile.seek(position);
             int bytesRead = randomAccessFile.read(buffer);
             if (bytesRead == -1)
