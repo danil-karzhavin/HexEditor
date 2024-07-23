@@ -1,3 +1,8 @@
+package App;
+
+import TableCompnent.ITableComponent;
+import TableCompnent.TableComponent;
+
 import javax.swing.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -5,10 +10,11 @@ import java.awt.event.WindowListener;
 public class App extends JFrame {
     public JMenuBar jmenuBar;
     public MenuBar menuBar;
-    public HexAreaComponent hexArea;
+    public ITableComponent hexTable;
     public JTextArea charArea;
+    Box box;
     JPanel panel;
-    // FileService fs = null;
+    // FileService.FileService fs = null;
     DialogExitComponent dialogExitComp;
 
     public static void main(String[] args) {
@@ -34,13 +40,14 @@ public class App extends JFrame {
             public void windowDeactivated(WindowEvent e) { }
             @Override
             public void windowClosing(WindowEvent event) {
-                if((hexArea.getFileService() == null) || (hexArea.getJtextArea().getText() == hexArea.getFileService().getStringContent()) || hexArea.getJtextArea().getText().length() == 0){
-                    System.exit(0);
-                }
-                else {
-                    dialogExitComp = new DialogExitComponent(App.this);
-                    dialogExitComp.createDialogFrame("Выход");
-                }
+//                if((hexArea.getFileService() == null) || (hexArea.getJtextArea().getText() == hexArea.getFileService().getStringContent()) || hexArea.getJtextArea().getText().length() == 0){
+//                    System.exit(0);
+//                }
+//                else {
+//                    dialogExitComp = new App.DialogExitComponent(App.App.this);
+//                    dialogExitComp.createDialogFrame("Выход");
+//                }
+                System.exit(0);
             }
         });
 
@@ -55,17 +62,15 @@ public class App extends JFrame {
         // Подключаем меню к интерфейсу приложения (JFrame.setJMenuBar)
         setJMenuBar(jmenuBar);
         ///////////////////////////////////////////////////////////////////////////////////////////
+        Box box1 = new Box(BoxLayout.Y_AXIS);
+        //////////////////////////////////////// JTableArea ////////////////////////////////////////
+        hexTable = new TableComponent(this);
 
-        panel = new JPanel();
-        //////////////////////////////////////// JTextArea ////////////////////////////////////////
-        hexArea = new HexAreaComponent(this);
+        box1.add(hexTable.getScrollPaneTableComponent());
+        pack();
 
-
-        //charArea =
-        panel.add(hexArea.getScrollPaneComponent());
-        //panel.add(new JScrollPane(charArea));
         ///////////////////////////////////////////////////////////////////////////////////////////
-        setContentPane(panel);
+        setContentPane(box1);
 
         // Открытие окна
         setSize(1200, 800);

@@ -1,9 +1,12 @@
+package FileService;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Optional;
 
 public class FileService {
     public String path;
+    public int countLines = 0;
 
     // массив байтов исходного файла
     private byte[] content = new byte[0];
@@ -101,46 +104,63 @@ public class FileService {
         return contentChar;
     }
 
-    public void SetContent(){
-        try(FileOutputStream fos = new FileOutputStream(path)){
-            fos.write(content, 0, content.length);
-        }
-        catch (IOException ex2){
-            System.out.println(ex2.getMessage());
-        }
-    }
-
-    public void SetContentNewFile(String path){
-        try(FileOutputStream fos = new FileOutputStream(path)){
-            fos.write(content, 0, content.length);
-        }
-        catch (IOException ex2){
-            System.out.println(ex2.getMessage());
-        }
-    }
     /////// new methods
-        public void largeFileReader(){
-            try{
-                this.randomAccessFile = new RandomAccessFile(path, "r");
-            }
-            catch (FileNotFoundException ex) {
-                System.out.println("Файл не найден: " + ex.getMessage());
-            }
+    public void largeFileReader(){
+        try{
+            this.randomAccessFile = new RandomAccessFile(path, "r");
         }
+        catch (FileNotFoundException ex) {
+            System.out.println("Файл не найден: " + ex.getMessage());
+        }
+    }
 
-        public String readBlock(long position, int buffer_size) throws IOException{
-            buffer = new byte[buffer_size];
-            randomAccessFile.seek(position);
-            int bytesRead = randomAccessFile.read(buffer);
-            if (bytesRead == -1)
-                return "";
-            return new String(buffer, 0, bytesRead);
-        }
-        public long length() throws IOException {
-            return randomAccessFile.length();
-        }
+    public byte[] readBlock(long position, int buffer_size) throws IOException{
+        buffer = new byte[buffer_size];
+        randomAccessFile.seek(position);
+        int bytesRead = randomAccessFile.read(buffer);
+        if (bytesRead == -1)
+            return new byte[] {};
+        return buffer;
+        //return new String(buffer, 0, bytesRead);
+    }
 
-        public void close() throws IOException {
-            randomAccessFile.close();
+    public ArrayList<String> readOneLine(int position) throws IOException{
+        ArrayList<String> lines = new ArrayList<String>();
+        randomAccessFile.seek(position);
+        int b;
+        do{
+            b = randomAccessFile.read();
+            if (b == -1)
+                break;
+            String hexView = byteToHex((byte) b);
+            lines.add(hexView);
         }
+        while ((b > 0) && (b != '\n'));
+
+        return lines;
+    }
+    public long length() throws IOException {
+        return randomAccessFile.length();
+    }
+
+    public void close() throws IOException {
+        randomAccessFile.close();
+    }
+
+    public int getMaxWidthRow() throws IOException {
+        int maxWidth = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+            String line;
+            maxWidth = 0;
+            while ((line = reader.readLine()) != null) {
+                countLines += 1;
+                if (line.length() > maxWidth)
+                    maxWidth = line.length();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        System.out.println(maxWidth);
+        return maxWidth + 2;
+    }
 }

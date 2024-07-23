@@ -1,3 +1,7 @@
+package App;
+
+import TableCompnent.TableComponent;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,11 +47,11 @@ public class MenuBar extends JFrame {
                 if (result == JFileChooser.APPROVE_OPTION )
                     path = fileChooser.getSelectedFile().getAbsolutePath(); // need call back
 
-
-                app.hexArea.createFileService(path);
+                app.hexTable.createFileService(path);
                 try{
-                    app.hexArea.loadNextContent();
-                    app.hexArea.area.replaceRange("", 0, 8); // тупой костыль
+                    app.hexTable.loadNextContent();
+                    app.hexTable.loadNextContent();
+                    // app.hexArea.area.replaceRange("", 0, 8); // тупой костыль
                 }
                 catch (IOException ex){
                     ex.printStackTrace();
