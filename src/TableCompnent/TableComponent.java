@@ -10,11 +10,10 @@ import java.util.TreeMap;
 
 import App.App;
 import FileService.FileService;
+
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 
 public class TableComponent implements ITableComponent {
     FileService fs = null;
@@ -22,19 +21,24 @@ public class TableComponent implements ITableComponent {
     CustomTableModel tableModel = null;
     JScrollPane scrollPane = null;
     App parentObj = null;
-    int position = 0;
+
+    int posByteNextBlock = 0;
+
     int currentRow = 0;
-    final int countLines= 100;
+    final int countLinesInBlock = 100;
     int maxWidthRow = 1;
     // Модель столбцов таблицы
     private TableColumnModel columnModel;
     private int countLoadedBlocks = 0;
+    private TreeMap<Integer, TableBlock> blocks;
 
     public TableComponent(App parentObj){
         this.parentObj = parentObj;
         this.tableModel = new CustomTableModel();
         createTable();
         columnModel = table.getColumnModel();
+
+        blocks = new TreeMap<Integer, TableBlock>();
     }
 
     public JScrollPane getScrollPaneTableComponent(){
@@ -61,7 +65,7 @@ public class TableComponent implements ITableComponent {
                                 erasePrevContent();
 
                                 // Выбираем строку после отображения окна
-                                int tmp = countLines;
+                                int tmp = countLinesInBlock;
 
                                 SwingUtilities.invokeLater(() -> setSelectedRow(tmp));
                             }
@@ -117,8 +121,10 @@ public class TableComponent implements ITableComponent {
 
     @Override
     public void loadNextContent() throws IOException {
-        for(int i = 0; i < countLines; ++i){
-            ArrayList<String> data = fs.readOneLine(position);
+        var newBlock = new TableBlock();
+
+        for(int i = 0; i < countLinesInBlock; ++i){
+            ArrayList<String> data = fs.readOneLine(posByteNextBlock);
 
             if (data.size() == 0)
                 break;
@@ -127,15 +133,26 @@ public class TableComponent implements ITableComponent {
                 maxWidthRow = data.size();
 
             currentRow += 1;
-            position += data.size();
+            if (newBlock.bytePosition == null) {
+                newBlock.bytePosition = posByteNextBlock;
+                TableBlock.posByteStartCurBlock = posByteNextBlock;
+            }
+
+            newBlock.countLines += 1;
+            newBlock.countBytes += data.size();
+
+            posByteNextBlock += data.size();
 
             tableModel.addRowEnd(currentRow, data);
         }
-        countLoadedBlocks += 1;
+        if (!blocks.keySet().contains(newBlock.bytePosition))
+            blocks.put(newBlock.bytePosition, newBlock);
+
+        TableBlock.indexEndBlock = blocks.size() - 1;
     }
 
     public void erasePrevContent() throws IOException{
-        tableModel.eraseStartRow(currentRow, countLines);
+        tableModel.eraseStartRow(countLinesInBlock);
         //System.out.println("erasePrevContent() called");
     }
 

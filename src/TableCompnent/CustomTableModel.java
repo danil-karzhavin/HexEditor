@@ -21,7 +21,7 @@ public class CustomTableModel extends DefaultTableModel {
         super.addRow(rowData);
     }
     // erase() ------------
-    public void eraseStartRow(int currentRow, int countLines){
+    public void eraseStartRow(int countLines){
         //int start = (currentRow - 2 * countLines) >= 0 ? (currentRow - 2 * countLines) : 0;
         int start = 0;
         //int end = currentRow - countLines;
