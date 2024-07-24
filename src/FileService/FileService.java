@@ -1,10 +1,14 @@
 package FileService;
 
+import TableCompnent.TableBlock;
+import TableCompnent.TableComponent;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Optional;
 
 public class FileService {
+    public int maxWidthRow = 0;
     public String path;
     public int countLines = 0;
 
@@ -25,6 +29,12 @@ public class FileService {
     public FileService(String path){
         setPath(path);
         largeFileReader();
+//        try {
+//            maxWidthRow = getMaxWidthRow();
+//        }
+//        catch (IOException ex){
+//            ex.printStackTrace();
+//        }
     }
 
     private void setPath(String path){
@@ -162,5 +172,64 @@ public class FileService {
         }
         System.out.println(maxWidth);
         return maxWidth + 2;
+    }
+
+    public ArrayList<TableBlock> setBlockStatistics(){
+        ArrayList<TableBlock> blocks = new ArrayList<TableBlock>();
+        ArrayList<Byte> bytes = new ArrayList<Byte>();
+        int countRows = 0;
+        int countBytes = 0; // count bytes in block
+        Integer firstBytePos = null; // first byte in block
+        Integer numRow = null;
+
+        int bytePosInFile = 0; // count bytes in file
+        int countRowsInFile = 0;
+
+        try (FileInputStream fin = new FileInputStream(path)) {
+            int b;
+            do{
+                b = fin.read();
+                if (b > 0){
+                    if (firstBytePos == null)
+                        firstBytePos = bytePosInFile;
+                    if (numRow == null)
+                        numRow = countRowsInFile;
+
+                    countBytes += 1;
+                    bytePosInFile += 1;
+
+                }
+
+                if ( b == '\n' || b <= 0){
+                    countRows += 1;
+                    countRowsInFile += 1;
+                }
+
+                if (countRows >= TableComponent.countLinesInBlock || b <= 0){
+
+                    var newBlock = new TableBlock();
+                    newBlock.countBytes = countBytes;
+                    newBlock.countRows = countRows;
+                    newBlock.firstBytePos = firstBytePos;
+                    newBlock.numRow = numRow + 1;
+                    blocks.add(newBlock);
+
+                    // восстанавливаем значения
+                    countRows = 0;
+                    countBytes = 0;
+                    firstBytePos = null;
+                    numRow = null;
+                }
+            }
+            while (b > 0);
+
+        } catch (FileNotFoundException ex1) {
+            System.out.println(ex1.getMessage());
+            // вызвать окно программы, что файл не найден
+        } catch (IOException ex2) {
+            System.out.println(ex2.getMessage());
+            // вызвать окно программы, что произошла проблема ввода вывода
+        }
+        return blocks;
     }
 }

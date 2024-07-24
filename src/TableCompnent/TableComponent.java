@@ -21,24 +21,18 @@ public class TableComponent implements ITableComponent {
     CustomTableModel tableModel = null;
     JScrollPane scrollPane = null;
     App parentObj = null;
-
-    int posByteNextBlock = 0;
-
-    int currentRow = 0;
-    final int countLinesInBlock = 100;
+    public final static int countLinesInBlock = 100;
     int maxWidthRow = 1;
+    boolean loadWasRun = false;
     // Модель столбцов таблицы
     private TableColumnModel columnModel;
-    private int countLoadedBlocks = 0;
-    private TreeMap<Integer, TableBlock> blocks;
+    private ArrayList<TableBlock> blocks;
 
     public TableComponent(App parentObj){
         this.parentObj = parentObj;
         this.tableModel = new CustomTableModel();
         createTable();
         columnModel = table.getColumnModel();
-
-        blocks = new TreeMap<Integer, TableBlock>();
     }
 
     public JScrollPane getScrollPaneTableComponent(){
@@ -59,28 +53,32 @@ public class TableComponent implements ITableComponent {
                     int value = scrollbar.getModel().getValue();
 
                     if (fs != null) {
-                        if (((max - extent) == value) && (currentRow < fs.countLines)) {
+                        if (((max - extent) == value) && (TableBlock.currentBlockPos < (blocks.size() - 1))) {
                             try {
+                                loadWasRun = true;
                                 loadNextContent();
                                 erasePrevContent();
 
-                                // Выбираем строку после отображения окна
-                                int tmp = countLinesInBlock;
-
-                                SwingUtilities.invokeLater(() -> setSelectedRow(tmp));
+                                SwingUtilities.invokeLater(() -> setSelectedRow(countLinesInBlock, true));
                             }
                             catch(IOException ex){
                                 ex.printStackTrace();
                             }
                         }
-//                        else if((scrollbar.getValue() == min) && position != 0){
-//                            try {
-//
-//                            }
-//                            catch (IOException ex){
-//                                ex.printStackTrace();
-//                            }
-//                        }
+                        else if((scrollbar.getValue() == min) && (TableBlock.currentBlockPos > 1) && loadWasRun){
+                            try {
+                                loadPrevContent();
+                                eraseEndContent();
+
+                                //SwingUtilities.invokeLater(() -> setSelectedRow(countLinesInBlock, false));
+                            }
+                            catch (IOException ex){
+                                ex.printStackTrace();
+                            }
+                            catch (IndexOutOfBoundsException ex_1){
+                                ex_1.printStackTrace();
+                            }
+                        }
 
                     }
                 }
@@ -90,7 +88,7 @@ public class TableComponent implements ITableComponent {
     }
 
     // установка выделения на определенной строке
-    public void setSelectedRow(int rowIndex) {
+    public void setSelectedRow(int rowIndex, boolean isNext) {
         // Проверяем, что индекс допустим
         if (rowIndex >= 0) {
 
@@ -98,7 +96,10 @@ public class TableComponent implements ITableComponent {
             // Смещаем прямоугольник вверх на высоту видимой области, чтобы строка оказалась внизу
             JViewport viewport = (JViewport) table.getParent();
             Rectangle viewRect = viewport.getViewRect();
-            cellRect.y -= viewRect.height;
+            if (isNext)
+                cellRect.y -= viewRect.height;
+            else
+                cellRect.y -= viewRect.height;
 
             // Прокручиваем таблицу, чтобы выбранная строка была видна внизу
             table.scrollRectToVisible(cellRect);
@@ -111,7 +112,8 @@ public class TableComponent implements ITableComponent {
     public void createFileService(String path) {
         fs = new FileService(path);
         try {
-            maxWidthRow = fs.getMaxWidthRow();
+            maxWidthRow = fs.getMaxWidthRow(); // нельзя вызывать больше одного раза
+            blocks = fs.setBlockStatistics();
         }
         catch (IOException ex){
             ex.printStackTrace();
@@ -121,9 +123,13 @@ public class TableComponent implements ITableComponent {
 
     @Override
     public void loadNextContent() throws IOException {
-        var newBlock = new TableBlock();
+        TableBlock.currentBlockPos += 1;
+        TableBlock.countBlocksOnScreen += 1;
 
-        for(int i = 0; i < countLinesInBlock; ++i){
+        int posByteNextBlock = blocks.get(TableBlock.currentBlockPos).firstBytePos;
+        var block = blocks.get(TableBlock.currentBlockPos);
+
+        for(int i = 0; i < blocks.get(TableBlock.currentBlockPos).countRows; ++i){
             ArrayList<String> data = fs.readOneLine(posByteNextBlock);
 
             if (data.size() == 0)
@@ -132,32 +138,49 @@ public class TableComponent implements ITableComponent {
             if (data.size() > maxWidthRow)
                 maxWidthRow = data.size();
 
-            currentRow += 1;
-            if (newBlock.bytePosition == null) {
-                newBlock.bytePosition = posByteNextBlock;
-                TableBlock.posByteStartCurBlock = posByteNextBlock;
-            }
-
-            newBlock.countLines += 1;
-            newBlock.countBytes += data.size();
-
             posByteNextBlock += data.size();
 
-            tableModel.addRowEnd(currentRow, data);
+            tableModel.addRowEnd(block.numRow + i, data);
         }
-        if (!blocks.keySet().contains(newBlock.bytePosition))
-            blocks.put(newBlock.bytePosition, newBlock);
-
-        TableBlock.indexEndBlock = blocks.size() - 1;
     }
 
     public void erasePrevContent() throws IOException{
         tableModel.eraseStartRow(countLinesInBlock);
+        TableBlock.countBlocksOnScreen -= 1;
         //System.out.println("erasePrevContent() called");
     }
 
-    public void loadPrevContent() throws IOException{
+    public void loadPrevContent() throws IndexOutOfBoundsException, IOException{
+        int blockPos = TableBlock.currentBlockPos - TableBlock.countBlocksOnScreen;
+        var block = blocks.get(blockPos);
+        int posByteNextBlock = block.firstBytePos;
+        ArrayList<String> data;
 
+        if (blockPos < 0)
+            throw new IndexOutOfBoundsException();
+
+        for (int i = 0; i < block.countRows; i++){
+            data = fs.readOneLine(posByteNextBlock);
+
+            if (data.size() == 0)
+                break;
+
+            posByteNextBlock += data.size();
+            tableModel.addRowStart(block.numRow + i, data, i);
+        }
+
+        TableBlock.countBlocksOnScreen += 1;
+
+    }
+
+    public void eraseEndContent(){
+        int blockPos = TableBlock.currentBlockPos;
+        var block = blocks.get(blockPos);
+        for(int i = 0; i < block.countRows; ++i)
+            tableModel.eraseEndRow();
+
+        TableBlock.currentBlockPos -= 1;
+        TableBlock.countBlocksOnScreen -= 1;
     }
 
     public void createTable(){
