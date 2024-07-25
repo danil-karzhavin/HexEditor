@@ -8,7 +8,7 @@ public interface ITableComponent {
     public void createFileService(String path);
 
     public void loadNextContent() throws IOException;
-    public void erasePrevContent() throws IOException;
+    public int erasePrevContent() throws IOException;
     public void loadPrevContent() throws IOException;
 
     public JScrollPane getScrollPaneTableComponent();

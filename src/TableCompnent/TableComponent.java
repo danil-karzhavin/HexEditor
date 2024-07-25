@@ -53,7 +53,7 @@ public class TableComponent implements ITableComponent {
                     int value = scrollbar.getModel().getValue();
 
                     if (fs != null) {
-                        if (((max - extent) == value) && (TableBlock.currentBlockPos < (blocks.size() - 1))) {
+                        if (((max - extent) == value) && (TableBlock.currentBlockPos + 1 < blocks.size())) {
                             try {
                                 loadWasRun = true;
                                 loadNextContent();
@@ -144,10 +144,14 @@ public class TableComponent implements ITableComponent {
         }
     }
 
-    public void erasePrevContent() throws IOException{
-        tableModel.eraseStartRow(countLinesInBlock);
+    public int erasePrevContent() throws IOException{
+        int pos = TableBlock.currentBlockPos - (TableBlock.countBlocksOnScreen - 1);
+        int countRowsErase = blocks.get(pos).countRows;
+
+        tableModel.eraseStartRow(countRowsErase);
         TableBlock.countBlocksOnScreen -= 1;
         //System.out.println("erasePrevContent() called");
+        return countRowsErase;
     }
 
     public void loadPrevContent() throws IndexOutOfBoundsException, IOException{
