@@ -29,12 +29,6 @@ public class FileService {
     public FileService(String path){
         setPath(path);
         largeFileReader();
-//        try {
-//            maxWidthRow = getMaxWidthRow();
-//        }
-//        catch (IOException ex){
-//            ex.printStackTrace();
-//        }
     }
 
     private void setPath(String path){
@@ -72,20 +66,20 @@ public class FileService {
         else return content;
     }
 
-    public String getStringContent(){
-        if (contentHex.isEmpty()){
-            content = getContent();
-
-            ArrayList<String> tmp = new ArrayList<String>();
-
-            for (var el : content){
-                tmp.add(byteToHex(el));
-            }
-            Optional<String> res =  tmp.stream().reduce((a, b) -> a + " " + b);
-            contentHex = res.get();
-        }
-        return contentHex;
-    }
+//    public String getStringContent(){
+//        if (contentHex.isEmpty()){
+//            content = getContent();
+//
+//            ArrayList<String> tmp = new ArrayList<String>();
+//
+//            for (var el : content){
+//                tmp.add(byteToHex(el));
+//            }
+//            Optional<String> res =  tmp.stream().reduce((a, b) -> a + " " + b);
+//            contentHex = res.get();
+//        }
+//        return contentHex;
+//    }
 
     public static String byteToHex(byte b) {
         // & 0xFF преобразует байт к беззнаковому целому
@@ -99,19 +93,32 @@ public class FileService {
         return hex.toUpperCase();  // Приводим к верхнему регистру для единства стиля
     }
 
-    public String getCharContent(){
-        if (contentChar == null){
-            getContent();
+//    public String getCharContent(){
+//        if (contentChar == null){
+//            getContent();
+//
+//            ArrayList<Character> tmp = new ArrayList<Character>();
+//            for(int i = 0; i < content.length; ++i){
+//                tmp.add(i, (char) (content[i] & 0xFF));
+//            }
+//            Optional<String> res = tmp.stream().map(ch -> Character.toString(ch)).reduce((a, b) -> a + " " + b);
+//            contentChar = res.get();
+//            System.out.println(contentChar);
+//        }
+//        return contentChar;
+//    }
 
-            ArrayList<Character> tmp = new ArrayList<Character>();
-            for(int i = 0; i < content.length; ++i){
-                tmp.add(i, (char) (content[i] & 0xFF));
-            }
-            Optional<String> res = tmp.stream().map(ch -> Character.toString(ch)).reduce((a, b) -> a + " " + b);
-            contentChar = res.get();
-            System.out.println(contentChar);
+    public static byte hexStringToByte(String hexString) throws NumberFormatException {
+        if (hexString == null || hexString.length() != 2) {
+            throw new IllegalArgumentException("Строка должна содержать ровно 2 символа.");
         }
-        return contentChar;
+
+        // Преобразование шестнадцатеричной строки в int, а затем в byte
+        int intValue = Integer.parseInt(hexString, 16);
+
+        // Преобразование int в byte (обработка переполнения)
+        // Добавляем логическое "и" с 0xFF, чтобы избавиться от возможного знака
+        return (byte)(intValue & 0xFF);
     }
 
     /////// new methods
@@ -124,15 +131,14 @@ public class FileService {
         }
     }
 
-    public byte[] readBlock(long position, int buffer_size) throws IOException{
-        buffer = new byte[buffer_size];
-        randomAccessFile.seek(position);
-        int bytesRead = randomAccessFile.read(buffer);
-        if (bytesRead == -1)
-            return new byte[] {};
-        return buffer;
-        //return new String(buffer, 0, bytesRead);
-    }
+//    public byte[] readBlock(long position, int buffer_size) throws IOException{
+//        buffer = new byte[buffer_size];
+//        randomAccessFile.seek(position);
+//        int bytesRead = randomAccessFile.read(buffer);
+//        if (bytesRead == -1)
+//            return new byte[] {};
+//        return buffer;
+//    }
 
     public ArrayList<String> readOneLine(int position) throws IOException{
         ArrayList<String> lines = new ArrayList<String>();
@@ -232,4 +238,16 @@ public class FileService {
         }
         return blocks;
     }
+
+//    public ArrayList<String> getValues(ArrayList<TableBlock> blocks, int row, int col){
+//        TableBlock blockPtr;
+//        int bytePos = 0;
+//        for(var block : blocks){
+//            if (row >= (block.numRow - 1)){
+//                blockPtr = block;
+//                break;
+//            }
+//        }
+//
+//    }
 }

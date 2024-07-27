@@ -3,6 +3,9 @@ package TableCompnent;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -10,6 +13,7 @@ import java.util.TreeMap;
 
 import App.App;
 import FileService.FileService;
+import TableCompnent.DialogFrame.DialogFrame;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -18,9 +22,9 @@ import javax.swing.table.TableColumnModel;
 public class TableComponent implements ITableComponent {
     FileService fs = null;
     JTable table = null;
-    CustomTableModel tableModel = null;
+    public CustomTableModel tableModel = null;
     JScrollPane scrollPane = null;
-    App parentObj = null;
+    public App parentObj = null;
     public final static int countLinesInBlock = 100;
     int maxWidthRow = 1;
     boolean loadWasRun = false;
@@ -33,6 +37,20 @@ public class TableComponent implements ITableComponent {
         this.tableModel = new CustomTableModel();
         createTable();
         columnModel = table.getColumnModel();
+
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int row = table.rowAtPoint(e.getPoint());
+                    int col = table.columnAtPoint(e.getPoint());
+
+                    if (row != -1 && col != -1) {
+                        new DialogFrame(TableComponent.this, row, col);
+                    }
+                }
+            }
+        });
     }
 
     public JScrollPane getScrollPaneTableComponent(){
