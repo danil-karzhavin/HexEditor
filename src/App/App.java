@@ -2,6 +2,7 @@ package App;
 
 import TableCompnent.ITableComponent;
 import TableCompnent.TableComponent;
+import TextSearch.TextSearchComponent;
 
 import javax.swing.*;
 import java.awt.event.WindowEvent;
@@ -12,10 +13,15 @@ public class App extends JFrame {
     public MenuBar menuBar;
     public ITableComponent hexTable;
     public JTextArea charArea;
-    Box box;
+    //Box box1;
     JPanel panel;
     // FileService.FileService fs = null;
     DialogExitComponent dialogExitComp;
+
+    JTextField textSearch = null;
+    JLabel searchRes = null;
+    JButton searchBtn, backBtn, nextBtn;
+    TextSearchComponent textSearchComp;
 
     public static void main(String[] args) {
         // Подключение украшений для окон
@@ -62,15 +68,32 @@ public class App extends JFrame {
         // Подключаем меню к интерфейсу приложения (JFrame.setJMenuBar)
         setJMenuBar(jmenuBar);
         ///////////////////////////////////////////////////////////////////////////////////////////
-        Box box1 = new Box(BoxLayout.Y_AXIS);
+        panel = new JPanel();
         //////////////////////////////////////// JTableArea ////////////////////////////////////////
         hexTable = new TableComponent(this);
 
-        box1.add(hexTable.getScrollPaneTableComponent());
+        panel.add(hexTable.getScrollPaneTableComponent());
         pack();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        setContentPane(box1);
+
+        //////////////////////////////////////// TextSearch ////////////////////////////////////////
+        textSearch = new JTextField(100);
+        searchRes = new JLabel("Найдено 2 совпадения");
+        searchBtn = new JButton("Поиск");
+        backBtn = new JButton("Назад");
+        nextBtn = new JButton("Вперед");
+
+        panel.add(textSearch);
+        panel.add(searchRes);
+        panel.add(searchBtn);
+        panel.add(backBtn);
+        panel.add(nextBtn);
+
+        textSearchComp = new TextSearchComponent(textSearch, searchRes, searchBtn, backBtn, nextBtn, this);
+
+        pack();
+        setContentPane(panel);
 
         // Открытие окна
         setSize(1200, 800);

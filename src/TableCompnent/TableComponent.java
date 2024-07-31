@@ -218,6 +218,7 @@ public class TableComponent implements ITableComponent {
         table.setVisible(true);
 
         //table.setSize(100, 100);
+        table.setPreferredScrollableViewportSize(new Dimension(1000, 500));
         Enumeration<TableColumn> e = columnModel.getColumns();
         while ( e.hasMoreElements() ) {
             TableColumn column = (TableColumn)e.nextElement();

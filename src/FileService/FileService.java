@@ -5,6 +5,7 @@ import TableCompnent.TableComponent;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class FileService {
@@ -237,6 +238,33 @@ public class FileService {
             // вызвать окно программы, что произошла проблема ввода вывода
         }
         return blocks;
+    }
+
+    public List<Byte> SearchSubArray(ArrayList<Byte> data){
+        try (RandomAccessFile fin = new RandomAccessFile(path, "r")){
+            int pos = 0;
+            Byte b;
+            do{
+                b = (byte) fin.read();
+                for(var el : data){
+                    if (b != el)
+                        break;
+                    b = (byte) fin.read();
+                }
+            }
+            while(b > 0);
+        }
+        catch (FileNotFoundException ex1) {
+            System.out.println(ex1.getMessage());
+            // вызвать окно программы, что файл не найден
+        } catch (IOException ex2) {
+            System.out.println(ex2.getMessage());
+            // вызвать окно программы, что произошла проблема ввода вывода
+        }
+
+        void readByte(){
+
+        }
     }
 
 //    public ArrayList<String> getValues(ArrayList<TableBlock> blocks, int row, int col){
