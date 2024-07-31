@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class FileService {
     public int maxWidthRow = 0;
-    public String path;
+    public static String path;
     public int countLines = 0;
 
     // массив байтов исходного файла
@@ -240,17 +240,30 @@ public class FileService {
         return blocks;
     }
 
-    public List<Byte> SearchSubArray(ArrayList<Byte> data){
+    public static List<Integer> SearchSubArray(List<Byte> data){
+        ArrayList<Integer> positions = new ArrayList<Integer>();
+
         try (RandomAccessFile fin = new RandomAccessFile(path, "r")){
-            int pos = 0;
-            Byte b;
+            int pos = 0, dopPos = 0;
+            boolean success = true;
+            Byte b = 0;
             do{
-                b = (byte) fin.read();
+                fin.seek(pos);
+
                 for(var el : data){
-                    if (b != el)
-                        break;
                     b = (byte) fin.read();
+                    if (b != el){
+                        success = false;
+                        break;
+                    }
+                    dopPos += 1;
                 }
+                if (success){
+                    positions.add(pos);
+                    pos += dopPos;
+                }
+                dopPos = 0;
+                pos += 1;
             }
             while(b > 0);
         }
@@ -261,10 +274,7 @@ public class FileService {
             System.out.println(ex2.getMessage());
             // вызвать окно программы, что произошла проблема ввода вывода
         }
-
-        void readByte(){
-
-        }
+        return positions;
     }
 
 //    public ArrayList<String> getValues(ArrayList<TableBlock> blocks, int row, int col){

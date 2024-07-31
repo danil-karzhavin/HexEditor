@@ -45,6 +45,12 @@ public class CustomTableModel extends DefaultTableModel {
         super.removeRow(pos);
     }
 
+    // erase()
+    public void eraseDataTable(){
+        var data = getDataVector();
+        data.clear();
+    }
+
     public int getCountBytesInTable(){
         int countBytes = 0;
         for (var row : getDataVector()){

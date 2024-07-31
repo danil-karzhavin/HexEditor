@@ -3,7 +3,20 @@ package TextSearch;
 import javax.swing.*;
 import App.App;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import FileService.FileService;
+
 public class TextSearchComponent {
+    List<Byte> hexValues;
+    List<Integer> positionsInFile;
+    List<Integer> indexBlockByPosInFile;
+    int currentBlockPos = 0;
     public JTextField textSearch;
     public JLabel searchRes = null;
     public JButton searchBtn, backBtn, nextBtn;
@@ -17,8 +30,79 @@ public class TextSearchComponent {
         this.nextBtn = nextBtn;
         this.parentObj = parentObj;
 
+        searchBtn.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String data = textSearch.getText();
+                StringToBytes(data);
+                positionsInFile = FileService.SearchSubArray(hexValues);
+                indexBlockByPosInFile = getIndexBlockByPosInFile(positionsInFile);
+            }
+        });
+
+        backBtn.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ((currentBlockPos > 0) && (currentBlockPos < indexBlockByPosInFile.size() - 1)){
+                    try{
+                        parentObj.hexTable.loadContentByIndexBlock(currentBlockPos);
+                    }
+                    catch (IOException ex){
+                        ex.printStackTrace();
+                    }
+                    currentBlockPos -= 1;
+                }
+            }
+        });
+
+        nextBtn.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (currentBlockPos < indexBlockByPosInFile.size() - 1){
+                    try{
+                        parentObj.hexTable.loadContentByIndexBlock(currentBlockPos);
+                    }
+                    catch (IOException ex){
+                        ex.printStackTrace();
+                    }
+                    currentBlockPos += 1;
+                }
+            }
+        });
+
     }
     public void setAppearance(){
     }
 
+    public List<Byte> StringToBytes(String hexString) {
+        hexValues = new ArrayList<Byte>();
+
+        // Регулярное выражение для пары шестнадцатеричных символов
+        Pattern pattern = Pattern.compile("([0-9A-Fa-f]{2})");
+        Matcher matcher = pattern.matcher(hexString);
+
+        // Поиск всех пар шестнадцатеричных символов
+        while (matcher.find()) {
+            byte b = FileService.hexStringToByte(matcher.group());
+            hexValues.add(b);
+        }
+        return hexValues;
+    }
+
+    public List<Integer> getIndexBlockByPosInFile(List<Integer> positionsInFile){
+        indexBlockByPosInFile = new ArrayList<Integer>();
+        for(var pos : positionsInFile){
+            for (int i = 0; i < parentObj.hexTable.blocks.size(); ++i){
+                var block = parentObj.hexTable.blocks.get(i);
+
+                int startPos = block.firstBytePos;
+                int endPos = block.countBytes + startPos;
+                if (startPos <= pos && pos <= endPos){
+                    indexBlockByPosInFile.add(pos);
+                }
+            }
+        }
+
+        return indexBlockByPosInFile;
+    }
 }

@@ -139,6 +139,18 @@ public class TableComponent implements ITableComponent {
         setAppearance();
     }
 
+    public void loadContentByIndexBlock(int index) throws IOException{
+        if (index < 0)
+            return;
+        TableBlock.currentBlockPos = index - 2;
+
+        tableModel.eraseDataTable(); // стираем всю таблицу
+
+        loadNextContent();
+        loadNextContent();
+
+    }
+
     @Override
     public void loadNextContent() throws IOException {
         TableBlock.currentBlockPos += 1;

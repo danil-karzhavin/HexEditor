@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import FileService.FileService;
 
 public class MenuBar extends JFrame {
     App app;
@@ -48,6 +49,7 @@ public class MenuBar extends JFrame {
                     path = fileChooser.getSelectedFile().getAbsolutePath(); // need call back
 
                 app.hexTable.createFileService(path);
+                FileService.path = path;
                 try{
                     app.hexTable.loadNextContent();
                     app.hexTable.loadNextContent();
