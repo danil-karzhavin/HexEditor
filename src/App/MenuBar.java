@@ -1,7 +1,5 @@
 package App;
 
-import TableCompnent.TableComponent;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,8 +49,8 @@ public class MenuBar extends JFrame {
                 app.hexTable.createFileService(path);
                 FileService.path = path;
                 try{
-                    app.hexTable.loadNextContent();
-                    app.hexTable.loadNextContent();
+                    app.hexTable.loadContentByIndexBlock(0);
+                    //app.hexTable.loadNextContent();
                     // app.hexArea.area.replaceRange("", 0, 8); // тупой костыль
                 }
                 catch (IOException ex){

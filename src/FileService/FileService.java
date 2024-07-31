@@ -9,21 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class FileService {
-    public int maxWidthRow = 0;
     public static String path;
     public int countLines = 0;
 
     // массив байтов исходного файла
     private byte[] content = new byte[0];
 
-    // строковое представление байтов в виде шестнадцатеричных значений, разд. пробелом
-    private String contentHex = "";
-
-    // массив символов на основе массива байтов content
-    private String contentChar;
-
-    // размер буфера
-    byte[] buffer = null;
 
     RandomAccessFile randomAccessFile;
 
@@ -67,21 +58,6 @@ public class FileService {
         else return content;
     }
 
-//    public String getStringContent(){
-//        if (contentHex.isEmpty()){
-//            content = getContent();
-//
-//            ArrayList<String> tmp = new ArrayList<String>();
-//
-//            for (var el : content){
-//                tmp.add(byteToHex(el));
-//            }
-//            Optional<String> res =  tmp.stream().reduce((a, b) -> a + " " + b);
-//            contentHex = res.get();
-//        }
-//        return contentHex;
-//    }
-
     public static String byteToHex(byte b) {
         // & 0xFF преобразует байт к беззнаковому целому
         // Метод toHexString преобразует это значение в шестнадцатеричную строку
@@ -93,21 +69,6 @@ public class FileService {
         }
         return hex.toUpperCase();  // Приводим к верхнему регистру для единства стиля
     }
-
-//    public String getCharContent(){
-//        if (contentChar == null){
-//            getContent();
-//
-//            ArrayList<Character> tmp = new ArrayList<Character>();
-//            for(int i = 0; i < content.length; ++i){
-//                tmp.add(i, (char) (content[i] & 0xFF));
-//            }
-//            Optional<String> res = tmp.stream().map(ch -> Character.toString(ch)).reduce((a, b) -> a + " " + b);
-//            contentChar = res.get();
-//            System.out.println(contentChar);
-//        }
-//        return contentChar;
-//    }
 
     public static byte hexStringToByte(String hexString) throws NumberFormatException {
         if (hexString == null || hexString.length() != 2) {
@@ -131,15 +92,6 @@ public class FileService {
             System.out.println("Файл не найден: " + ex.getMessage());
         }
     }
-
-//    public byte[] readBlock(long position, int buffer_size) throws IOException{
-//        buffer = new byte[buffer_size];
-//        randomAccessFile.seek(position);
-//        int bytesRead = randomAccessFile.read(buffer);
-//        if (bytesRead == -1)
-//            return new byte[] {};
-//        return buffer;
-//    }
 
     public ArrayList<String> readOneLine(int position) throws IOException{
         ArrayList<String> lines = new ArrayList<String>();
@@ -276,16 +228,4 @@ public class FileService {
         }
         return positions;
     }
-
-//    public ArrayList<String> getValues(ArrayList<TableBlock> blocks, int row, int col){
-//        TableBlock blockPtr;
-//        int bytePos = 0;
-//        for(var block : blocks){
-//            if (row >= (block.numRow - 1)){
-//                blockPtr = block;
-//                break;
-//            }
-//        }
-//
-//    }
 }

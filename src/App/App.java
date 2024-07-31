@@ -5,16 +5,20 @@ import TableCompnent.TableComponent;
 import TextSearch.TextSearchComponent;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 public class App extends JFrame {
+    public JButton nextPageBtn, prevPageBtn;
+    public JLabel currentPage;
     public JMenuBar jmenuBar;
     public MenuBar menuBar;
-    public ITableComponent hexTable;
+    public TableComponent hexTable;
     public JTextArea charArea;
     //Box box1;
-    JPanel panel;
+    public JPanel panel;
     // FileService.FileService fs = null;
     DialogExitComponent dialogExitComp;
 
@@ -73,7 +77,6 @@ public class App extends JFrame {
         hexTable = new TableComponent(this);
 
         panel.add(hexTable.getScrollPaneTableComponent());
-        pack();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
 
