@@ -1,7 +1,7 @@
 package TableCompnent;
 
 public class TableBlock {
-    public static Integer currentBlockPos = -1;
+    public static Integer currentBlockPos = 0;
     public static Integer countBlocksOnScreen = 0;
 
     public Integer firstBytePos = null;

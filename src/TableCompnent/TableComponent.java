@@ -55,11 +55,10 @@ public class TableComponent implements ITableComponent {
         prevPageBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (counter > 0){
+                if (TableBlock.currentBlockPos > 0){
                     try{
-                        counter -= 1;
-                        loadContentByIndexBlock(counter);
-                        currentPage.setText(String.format("%d из %d", counter + 1, blocks.size()));
+                        TableBlock.currentBlockPos -= 1;
+                        loadContentByIndexBlock(null);
                     }
                     catch (Exception ex){
                         ex.printStackTrace();
@@ -76,11 +75,10 @@ public class TableComponent implements ITableComponent {
         nextPageBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (counter < (blocks.size() - 1)){
+                if (TableBlock.currentBlockPos < (blocks.size() - 1)){
                     try{
-                        counter += 1;
-                        loadContentByIndexBlock(counter);
-                        currentPage.setText(String.format("%d из %d", counter + 1, blocks.size()));
+                        TableBlock.currentBlockPos += 1;
+                        loadContentByIndexBlock(null);
                     }
                     catch (Exception ex){
                         ex.printStackTrace();
@@ -124,10 +122,13 @@ public class TableComponent implements ITableComponent {
     }
 
     @Override
-    public void loadContentByIndexBlock(int index) throws IOException {
+    public void loadContentByIndexBlock(Integer nullableIndex) throws IOException {
+        int index = nullableIndex == null ? TableBlock.currentBlockPos : nullableIndex;
+
         tableModel.eraseDataTable();
 
         TableBlock.currentBlockPos = index;
+        currentPage.setText(String.format("%d из %d", index + 1, blocks.size()));
 
         int posByteNextBlock = blocks.get(TableBlock.currentBlockPos).firstBytePos;
         var block = blocks.get(TableBlock.currentBlockPos);
@@ -156,7 +157,7 @@ public class TableComponent implements ITableComponent {
     }
 
     public void setAppearance(){
-        setWidthTable(maxWidthRow);
+        setWidthTable(maxWidthRow + 1);
         table.setVisible(true);
 
         //table.setSize(100, 100);

@@ -34,23 +34,36 @@ public class TextSearchComponent {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String data = textSearch.getText();
-                StringToBytes(data);
+                hexValues = StringToBytes(data);
                 positionsInFile = FileService.SearchSubArray(hexValues);
                 indexBlockByPosInFile = getIndexBlockByPosInFile(positionsInFile);
+
+                try{
+                    currentBlockPos = 0;
+                    int indexBlock = indexBlockByPosInFile.get(currentBlockPos);
+                    parentObj.hexTable.loadContentByIndexBlock(indexBlock);
+                    searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
+                }
+                catch (IOException ex){
+                    ex.printStackTrace();
+                }
             }
         });
 
         backBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                if ((currentBlockPos > 0) && (currentBlockPos < indexBlockByPosInFile.size() - 1)){
+                if ((currentBlockPos > 0)){
                     try{
-                        parentObj.hexTable.loadContentByIndexBlock(currentBlockPos);
+                        currentBlockPos -= 1;
+                        int indexBlock = indexBlockByPosInFile.get(currentBlockPos);
+
+                        parentObj.hexTable.loadContentByIndexBlock(indexBlock);
+                        searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
                     }
                     catch (IOException ex){
                         ex.printStackTrace();
                     }
-                    currentBlockPos -= 1;
                 }
             }
         });
@@ -60,12 +73,15 @@ public class TextSearchComponent {
             public void actionPerformed(ActionEvent e) {
                 if (currentBlockPos < indexBlockByPosInFile.size() - 1){
                     try{
-                        parentObj.hexTable.loadContentByIndexBlock(currentBlockPos);
+                        currentBlockPos += 1;
+                        int indexBlock = indexBlockByPosInFile.get(currentBlockPos);
+
+                        parentObj.hexTable.loadContentByIndexBlock(indexBlock);
+                        searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
                     }
                     catch (IOException ex){
                         ex.printStackTrace();
                     }
-                    currentBlockPos += 1;
                 }
             }
         });
@@ -98,7 +114,8 @@ public class TextSearchComponent {
                 int startPos = block.firstBytePos;
                 int endPos = block.countBytes + startPos;
                 if (startPos <= pos && pos <= endPos){
-                    indexBlockByPosInFile.add(pos);
+                    indexBlockByPosInFile.add(i);
+                    break;
                 }
             }
         }

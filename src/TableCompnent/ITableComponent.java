@@ -9,7 +9,7 @@ public interface ITableComponent {
     public JLabel currentPage = null;
     public ArrayList<TableBlock> blocks = null;
     public void createFileService(String path);
-    public void loadContentByIndexBlock(int index) throws IOException;
+    public void loadContentByIndexBlock(Integer index) throws IOException;
 
     public JScrollPane getScrollPaneTableComponent();
 

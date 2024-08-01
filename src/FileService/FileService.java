@@ -2,6 +2,7 @@ package FileService;
 
 import TableCompnent.TableBlock;
 import TableCompnent.TableComponent;
+import TextSearch.SearchSubArray;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -196,7 +197,7 @@ public class FileService {
         ArrayList<Integer> positions = new ArrayList<Integer>();
 
         try (RandomAccessFile fin = new RandomAccessFile(path, "r")){
-            int pos = 0, dopPos = 0;
+            int pos = 0, dopPos = 0, numRow = 0;
             boolean success = true;
             Byte b = 0;
             do{
@@ -204,6 +205,8 @@ public class FileService {
 
                 for(var el : data){
                     b = (byte) fin.read();
+                    if (b == '\n')
+                        numRow += 1;
                     if (b != el){
                         success = false;
                         break;
@@ -211,11 +214,16 @@ public class FileService {
                     dopPos += 1;
                 }
                 if (success){
+//                    var obj = new SearchSubArray();
+//                    obj.bytePos = pos;
+//                    obj.rowInFile =
                     positions.add(pos);
                     pos += dopPos;
                 }
+                else
+                    pos += 1;
                 dopPos = 0;
-                pos += 1;
+                success = true;
             }
             while(b > 0);
         }
@@ -226,6 +234,8 @@ public class FileService {
             System.out.println(ex2.getMessage());
             // вызвать окно программы, что произошла проблема ввода вывода
         }
+
+
         return positions;
     }
 }

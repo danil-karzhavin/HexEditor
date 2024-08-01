@@ -82,7 +82,7 @@ public class App extends JFrame {
 
         //////////////////////////////////////// TextSearch ////////////////////////////////////////
         textSearch = new JTextField(100);
-        searchRes = new JLabel("Найдено 2 совпадения");
+        searchRes = new JLabel();
         searchBtn = new JButton("Поиск");
         backBtn = new JButton("Назад");
         nextBtn = new JButton("Вперед");

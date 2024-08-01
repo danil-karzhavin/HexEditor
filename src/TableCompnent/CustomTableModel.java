@@ -13,8 +13,8 @@ public class CustomTableModel extends DefaultTableModel {
     public void addRowEnd(int currentRow, ArrayList<String> bytes) {
         Object[] rowData = new Object[bytes.size() + 1];
         rowData[0] = currentRow;
-        for (int i = 1; i < bytes.size(); i++) {
-            rowData[i] = bytes.get(i);
+        for (int i = 1; i < rowData.length; i++) {
+            rowData[i] = bytes.get(i - 1);
         }
         super.addRow(rowData);
     }
@@ -23,6 +23,14 @@ public class CustomTableModel extends DefaultTableModel {
     public void eraseDataTable(){
         var data = getDataVector();
         data.clear();
+    }
+
+    public void highlightSubText(ArrayList<Byte> bytes){
+        for (int i = 0; i < dataVector.size(); ++i){
+            for (int j = 0; i < dataVector.get(i).size(); ++j){
+
+            }
+        }
     }
 
     public int getCountBytesInTable(){
