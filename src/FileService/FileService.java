@@ -193,8 +193,8 @@ public class FileService {
         return blocks;
     }
 
-    public static List<Integer> SearchSubArray(List<Byte> data){
-        ArrayList<Integer> positions = new ArrayList<Integer>();
+    public List<SearchSubArray> SearchSubArray(List<Byte> data, TableComponent tableComponent){
+        ArrayList<SearchSubArray> positions = new ArrayList<SearchSubArray>();
 
         try (RandomAccessFile fin = new RandomAccessFile(path, "r")){
             int pos = 0, dopPos = 0, numRow = 0;
@@ -214,10 +214,11 @@ public class FileService {
                     dopPos += 1;
                 }
                 if (success){
-//                    var obj = new SearchSubArray();
-//                    obj.bytePos = pos;
-//                    obj.rowInFile =
-                    positions.add(pos);
+                    var obj = new SearchSubArray();
+                    obj.bytePos = pos;
+                    obj.rowInFile = numRow;
+
+                    positions.add(obj);
                     pos += dopPos;
                 }
                 else
@@ -235,7 +236,18 @@ public class FileService {
             // вызвать окно программы, что произошла проблема ввода вывода
         }
 
+        for(var el : positions){
+            for (int i = 0; i < tableComponent.blocks.size(); ++i){
+                var block = tableComponent.blocks.get(i);
 
+                int startPos = block.firstBytePos;
+                int endPos = block.countBytes + startPos;
+                if (startPos <= el.bytePos && el.bytePos <= endPos){
+                    el.textBlockPos = i;
+                    break;
+                }
+            }
+        }
         return positions;
     }
 }

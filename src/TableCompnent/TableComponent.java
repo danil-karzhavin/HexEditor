@@ -16,7 +16,7 @@ import javax.swing.table.TableColumnModel;
 
 public class TableComponent implements ITableComponent {
     public int counter = 0;
-    FileService fs = null;
+    public FileService fs = null;
     JTable table = null;
     public CustomTableModel tableModel = null;
     JScrollPane scrollPane = null;

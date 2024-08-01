@@ -14,8 +14,8 @@ import FileService.FileService;
 
 public class TextSearchComponent {
     List<Byte> hexValues;
-    List<Integer> positionsInFile;
-    List<Integer> indexBlockByPosInFile;
+//    List<SearchSubArray> positionsInFile;
+    List<SearchSubArray> indexBlockByPosInFile;
     int currentBlockPos = 0;
     public JTextField textSearch;
     public JLabel searchRes = null;
@@ -35,12 +35,11 @@ public class TextSearchComponent {
             public void actionPerformed(ActionEvent e) {
                 String data = textSearch.getText();
                 hexValues = StringToBytes(data);
-                positionsInFile = FileService.SearchSubArray(hexValues);
-                indexBlockByPosInFile = getIndexBlockByPosInFile(positionsInFile);
+                indexBlockByPosInFile = parentObj.hexTable.fs.SearchSubArray(hexValues, parentObj.hexTable);
 
                 try{
                     currentBlockPos = 0;
-                    int indexBlock = indexBlockByPosInFile.get(currentBlockPos);
+                    int indexBlock = indexBlockByPosInFile.get(currentBlockPos).textBlockPos;
                     parentObj.hexTable.loadContentByIndexBlock(indexBlock);
                     searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
                 }
@@ -56,7 +55,7 @@ public class TextSearchComponent {
                 if ((currentBlockPos > 0)){
                     try{
                         currentBlockPos -= 1;
-                        int indexBlock = indexBlockByPosInFile.get(currentBlockPos);
+                        int indexBlock = indexBlockByPosInFile.get(currentBlockPos).textBlockPos;
 
                         parentObj.hexTable.loadContentByIndexBlock(indexBlock);
                         searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
@@ -74,7 +73,7 @@ public class TextSearchComponent {
                 if (currentBlockPos < indexBlockByPosInFile.size() - 1){
                     try{
                         currentBlockPos += 1;
-                        int indexBlock = indexBlockByPosInFile.get(currentBlockPos);
+                        int indexBlock = indexBlockByPosInFile.get(currentBlockPos).textBlockPos;
 
                         parentObj.hexTable.loadContentByIndexBlock(indexBlock);
                         searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
@@ -105,21 +104,21 @@ public class TextSearchComponent {
         return hexValues;
     }
 
-    public List<Integer> getIndexBlockByPosInFile(List<Integer> positionsInFile){
-        indexBlockByPosInFile = new ArrayList<Integer>();
-        for(var pos : positionsInFile){
-            for (int i = 0; i < parentObj.hexTable.blocks.size(); ++i){
-                var block = parentObj.hexTable.blocks.get(i);
-
-                int startPos = block.firstBytePos;
-                int endPos = block.countBytes + startPos;
-                if (startPos <= pos && pos <= endPos){
-                    indexBlockByPosInFile.add(i);
-                    break;
-                }
-            }
-        }
-
-        return indexBlockByPosInFile;
-    }
+//    public List<Integer> getIndexBlockByPosInFile(List<Integer> positionsInFile){
+//        indexBlockByPosInFile = new ArrayList<Integer>();
+//        for(var pos : positionsInFile){
+//            for (int i = 0; i < parentObj.hexTable.blocks.size(); ++i){
+//                var block = parentObj.hexTable.blocks.get(i);
+//
+//                int startPos = block.firstBytePos;
+//                int endPos = block.countBytes + startPos;
+//                if (startPos <= pos && pos <= endPos){
+//                    indexBlockByPosInFile.add(i);
+//                    break;
+//                }
+//            }
+//        }
+//
+//        return indexBlockByPosInFile;
+//    }
 }
