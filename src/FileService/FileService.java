@@ -3,15 +3,16 @@ package FileService;
 import TableCompnent.TableBlock;
 import TableCompnent.TableComponent;
 import TextSearch.SearchSubArray;
+import App.App;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class FileService {
     public static String path;
     public int countLines = 0;
+    public App app;
 
     // массив байтов исходного файла
     private byte[] content = new byte[0];
@@ -193,40 +194,67 @@ public class FileService {
         return blocks;
     }
 
-    public List<SearchSubArray> SearchSubArray(List<Byte> data, TableComponent tableComponent){
+    public List<SearchSubArray> SearchSubArray(List<Byte> data){
+        TableComponent tableComponent = app.hexTable;
         ArrayList<SearchSubArray> positions = new ArrayList<SearchSubArray>();
+        int countRowsInData = 0;
+
+        for(var el : data)
+            if (el == '\n')
+                countRowsInData += 1;
 
         try (RandomAccessFile fin = new RandomAccessFile(path, "r")){
-            int pos = 0, dopPos = 0, numRow = 0;
-            boolean success = true;
-            Byte b = 0;
+            int pos = 0, dopPos = 0, numRow = 0, posInCurRow = 0;
+            Integer startRowPos = null;
+            Byte byteCur = -1, bytePrev;
+
             do{
                 fin.seek(pos);
 
                 for(var el : data){
-                    b = (byte) fin.read();
-                    if (b == '\n')
-                        numRow += 1;
-                    if (b != el){
-                        success = false;
+                    bytePrev = byteCur;
+                    byteCur = (byte) fin.read(); // читаем байт
+
+                    // если байт совпадает с байтов в data, dopPos - количество совпадений
+                    if (el == byteCur){
+                        dopPos += 1;
+                    }
+
+                    if (bytePrev == '\n'){
+                        numRow += 1; // увеличиваем кол-во строк на 1
+                        posInCurRow = 0; // обнуляем счетчик байтов в текущей строке
+                    }
+
+                    // startRowPos - позиция байта в строке файла, где начинается data
+                    if (startRowPos == null){
+                        startRowPos = posInCurRow;
+                    }
+
+                    posInCurRow += 1;
+
+                    if (el != byteCur){
                         break;
                     }
-                    dopPos += 1;
                 }
-                if (success){
+                if (data.size() == dopPos){
                     var obj = new SearchSubArray();
-                    obj.bytePos = pos;
-                    obj.rowInFile = numRow;
-
+                    obj.startBytePos = pos;
+                    obj.rowInFile = numRow - countRowsInData;
+                    obj.posInRow = startRowPos;
+                    obj.lengthSearchData = data.size();
                     positions.add(obj);
+
                     pos += dopPos;
                 }
-                else
+                else{
+                    posInCurRow -= dopPos;
                     pos += 1;
+                }
+
                 dopPos = 0;
-                success = true;
+                startRowPos = null;
             }
-            while(b > 0);
+            while(byteCur > 0);
         }
         catch (FileNotFoundException ex1) {
             System.out.println(ex1.getMessage());
@@ -242,7 +270,7 @@ public class FileService {
 
                 int startPos = block.firstBytePos;
                 int endPos = block.countBytes + startPos;
-                if (startPos <= el.bytePos && el.bytePos <= endPos){
+                if (startPos <= el.startBytePos && el.startBytePos <= endPos){
                     el.textBlockPos = i;
                     break;
                 }

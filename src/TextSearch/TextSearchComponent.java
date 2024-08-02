@@ -14,79 +14,73 @@ import FileService.FileService;
 
 public class TextSearchComponent {
     List<Byte> hexValues;
-//    List<SearchSubArray> positionsInFile;
+    //    List<SearchSubArray> positionsInFile;
     List<SearchSubArray> indexBlockByPosInFile;
     int currentBlockPos = 0;
     public JTextField textSearch;
     public JLabel searchRes = null;
     public JButton searchBtn, backBtn, nextBtn;
-    public App parentObj;
+    public App app;
 
-    public TextSearchComponent(JTextField textSearch, JLabel searchRes, JButton searchBtn, JButton backBtn, JButton nextBtn, App parentObj){
-        this.textSearch = textSearch;
-        this.searchRes = searchRes;
-        this.searchBtn = searchBtn;
-        this.backBtn = backBtn;
-        this.nextBtn = nextBtn;
-        this.parentObj = parentObj;
+    public TextSearchComponent(App app) {
+        this.app = app;
+    }
 
-        searchBtn.addActionListener(new ActionListener(){
+    public void createListeners(){
+        searchBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String data = textSearch.getText();
                 hexValues = StringToBytes(data);
-                indexBlockByPosInFile = parentObj.hexTable.fs.SearchSubArray(hexValues, parentObj.hexTable);
+                indexBlockByPosInFile = app.fs.SearchSubArray(hexValues);
 
-                try{
+                try {
                     currentBlockPos = 0;
                     int indexBlock = indexBlockByPosInFile.get(currentBlockPos).textBlockPos;
-                    parentObj.hexTable.loadContentByIndexBlock(indexBlock);
+                    app.hexTable.loadContentByIndexBlock(indexBlock);
                     searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
-                }
-                catch (IOException ex){
+                } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
         });
 
-        backBtn.addActionListener(new ActionListener(){
+        backBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if ((currentBlockPos > 0)){
-                    try{
+                if ((currentBlockPos > 0)) {
+                    try {
                         currentBlockPos -= 1;
                         int indexBlock = indexBlockByPosInFile.get(currentBlockPos).textBlockPos;
 
-                        parentObj.hexTable.loadContentByIndexBlock(indexBlock);
+                        app.hexTable.loadContentByIndexBlock(indexBlock);
                         searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
-                    }
-                    catch (IOException ex){
+                    } catch (IOException ex) {
                         ex.printStackTrace();
                     }
                 }
             }
         });
 
-        nextBtn.addActionListener(new ActionListener(){
+        nextBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (currentBlockPos < indexBlockByPosInFile.size() - 1){
-                    try{
+                if (currentBlockPos < indexBlockByPosInFile.size() - 1) {
+                    try {
                         currentBlockPos += 1;
                         int indexBlock = indexBlockByPosInFile.get(currentBlockPos).textBlockPos;
 
-                        parentObj.hexTable.loadContentByIndexBlock(indexBlock);
+                        app.hexTable.loadContentByIndexBlock(indexBlock);
                         searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
-                    }
-                    catch (IOException ex){
+                    } catch (IOException ex) {
                         ex.printStackTrace();
                     }
                 }
             }
         });
-
     }
-    public void setAppearance(){
+
+    public void setAppearance() {
     }
 
     public List<Byte> StringToBytes(String hexString) {
@@ -103,22 +97,4 @@ public class TextSearchComponent {
         }
         return hexValues;
     }
-
-//    public List<Integer> getIndexBlockByPosInFile(List<Integer> positionsInFile){
-//        indexBlockByPosInFile = new ArrayList<Integer>();
-//        for(var pos : positionsInFile){
-//            for (int i = 0; i < parentObj.hexTable.blocks.size(); ++i){
-//                var block = parentObj.hexTable.blocks.get(i);
-//
-//                int startPos = block.firstBytePos;
-//                int endPos = block.countBytes + startPos;
-//                if (startPos <= pos && pos <= endPos){
-//                    indexBlockByPosInFile.add(i);
-//                    break;
-//                }
-//            }
-//        }
-//
-//        return indexBlockByPosInFile;
-//    }
 }

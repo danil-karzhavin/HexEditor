@@ -50,8 +50,9 @@ public class TableComponent implements ITableComponent {
                 }
             }
         });
+    }
 
-        prevPageBtn = new JButton("Предыдущая страница");
+    public void createListeners(){
         prevPageBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -66,12 +67,7 @@ public class TableComponent implements ITableComponent {
                 }
             }
         });
-        parentObj.panel.add(prevPageBtn);
 
-        currentPage = new JLabel("1 из ...");
-        parentObj.panel.add(currentPage);
-
-        nextPageBtn = new JButton("Следующая страница");
         nextPageBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -86,7 +82,6 @@ public class TableComponent implements ITableComponent {
                 }
             }
         });
-        parentObj.panel.add(nextPageBtn);
     }
 
     public JScrollPane getScrollPaneTableComponent(){
@@ -97,8 +92,8 @@ public class TableComponent implements ITableComponent {
     }
 
     @Override
-    public void createFileService(String path) {
-        fs = new FileService(path);
+    public FileService createFileService(FileService fs) {
+        this.fs = fs;
         try {
             maxWidthRow = fs.getMaxWidthRow(); // нельзя вызывать больше одного раза
             blocks = fs.setBlockStatistics();
@@ -107,6 +102,7 @@ public class TableComponent implements ITableComponent {
             ex.printStackTrace();
         }
         setAppearance();
+        return fs;
     }
 
     public void loadContentByIndexBloc(int index) throws IOException{

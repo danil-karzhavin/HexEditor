@@ -46,12 +46,9 @@ public class MenuBar extends JFrame {
                 if (result == JFileChooser.APPROVE_OPTION )
                     path = fileChooser.getSelectedFile().getAbsolutePath(); // need call back
 
-                app.hexTable.createFileService(path);
-                FileService.path = path;
+                app.createFileService(path);
                 try{
                     app.hexTable.loadContentByIndexBlock(0);
-                    //app.hexTable.loadNextContent();
-                    // app.hexArea.area.replaceRange("", 0, 8); // тупой костыль
                 }
                 catch (IOException ex){
                     ex.printStackTrace();
