@@ -199,9 +199,14 @@ public class FileService {
         ArrayList<SearchSubArray> positions = new ArrayList<SearchSubArray>();
         int countRowsInData = 0;
 
-        for(var el : data)
-            if (el == '\n')
+//        for(var el : data)
+//            if (el == '\n')
+//                countRowsInData += 1;
+
+        for (int i = 0; i < data.size(); ++i){
+            if(data.get(i) == '\n' && (i + 1) < data.size())
                 countRowsInData += 1;
+        }
 
         try (RandomAccessFile fin = new RandomAccessFile(path, "r")){
             int pos = 0, dopPos = 0, numRow = 0, posInCurRow = 0;

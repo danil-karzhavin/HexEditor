@@ -10,12 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import FileService.FileService;
 
 public class TextSearchComponent {
     List<Byte> hexValues;
     //    List<SearchSubArray> positionsInFile;
-    List<SearchSubArray> indexBlockByPosInFile;
+    List<SearchSubArray> searchObjects;
     int currentBlockPos = 0;
     public JTextField textSearch;
     public JLabel searchRes = null;
@@ -32,13 +31,16 @@ public class TextSearchComponent {
             public void actionPerformed(ActionEvent e) {
                 String data = textSearch.getText();
                 hexValues = StringToBytes(data);
-                indexBlockByPosInFile = app.fs.SearchSubArray(hexValues);
+                searchObjects = app.fs.SearchSubArray(hexValues);
 
                 try {
                     currentBlockPos = 0;
-                    int indexBlock = indexBlockByPosInFile.get(currentBlockPos).textBlockPos;
+                    int indexBlock = searchObjects.get(currentBlockPos).textBlockPos;
                     app.hexTable.loadContentByIndexBlock(indexBlock);
-                    searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
+
+                    app.hexTable.highlightSubText(searchObjects.get(currentBlockPos));
+
+                    searchRes.setText(String.format("%d из %d", currentBlockPos + 1, searchObjects.size()));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -51,10 +53,12 @@ public class TextSearchComponent {
                 if ((currentBlockPos > 0)) {
                     try {
                         currentBlockPos -= 1;
-                        int indexBlock = indexBlockByPosInFile.get(currentBlockPos).textBlockPos;
-
+                        int indexBlock = searchObjects.get(currentBlockPos).textBlockPos;
                         app.hexTable.loadContentByIndexBlock(indexBlock);
-                        searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
+
+                        app.hexTable.highlightSubText(searchObjects.get(currentBlockPos));
+
+                        searchRes.setText(String.format("%d из %d", currentBlockPos + 1, searchObjects.size()));
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -65,13 +69,15 @@ public class TextSearchComponent {
         nextBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (currentBlockPos < indexBlockByPosInFile.size() - 1) {
+                if (currentBlockPos < searchObjects.size() - 1) {
                     try {
                         currentBlockPos += 1;
-                        int indexBlock = indexBlockByPosInFile.get(currentBlockPos).textBlockPos;
-
+                        int indexBlock = searchObjects.get(currentBlockPos).textBlockPos;
                         app.hexTable.loadContentByIndexBlock(indexBlock);
-                        searchRes.setText(String.format("%d из %d", currentBlockPos + 1, indexBlockByPosInFile.size()));
+
+                        app.hexTable.highlightSubText(searchObjects.get(currentBlockPos));
+
+                        searchRes.setText(String.format("%d из %d", currentBlockPos + 1, searchObjects.size()));
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -92,7 +98,7 @@ public class TextSearchComponent {
 
         // Поиск всех пар шестнадцатеричных символов
         while (matcher.find()) {
-            byte b = FileService.hexStringToByte(matcher.group());
+            byte b = app.fs.hexStringToByte(matcher.group());
             hexValues.add(b);
         }
         return hexValues;
