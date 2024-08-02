@@ -4,6 +4,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
+import TextSearch.SearchSubArray;
 
 public class CustomTableModel extends DefaultTableModel {
 
@@ -25,14 +26,6 @@ public class CustomTableModel extends DefaultTableModel {
         data.clear();
     }
 
-    public void highlightSubText(ArrayList<Byte> bytes){
-        for (int i = 0; i < dataVector.size(); ++i){
-            for (int j = 0; i < dataVector.get(i).size(); ++j){
-
-            }
-        }
-    }
-
     public int getCountBytesInTable(){
         int countBytes = 0;
         for (var row : getDataVector()){
@@ -40,4 +33,5 @@ public class CustomTableModel extends DefaultTableModel {
         }
         return countBytes;
     }
+
 }

@@ -9,6 +9,7 @@ import java.util.Enumeration;
 import App.App;
 import FileService.FileService;
 import TableCompnent.DialogFrame.DialogFrame;
+import TextSearch.SearchSubArray;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -164,6 +165,8 @@ public class TableComponent implements ITableComponent {
             column.setMinWidth(30);
             column.setMaxWidth(40);
         }
+        table.setCellSelectionEnabled(true);
+        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     }
 
     public void setWidthTable(int width){
@@ -175,6 +178,36 @@ public class TableComponent implements ITableComponent {
             names[i] = String.valueOf(i);
 
         tableModel.setColumnIdentifiers(names);
+    }
+
+    public void highlightSubText(SearchSubArray item){
+        eraseSelectedCell();
+
+        int sizeData = item.lengthSearchData;
+        int posInRow = item.posInRow;
+
+        int i = item.rowInFile - blocks.get(item.textBlockPos).numRow + 1;
+
+        for(; i < tableModel.getDataVector().size(); ++i){
+            for (int j = posInRow + 1; j < tableModel.getDataVector().get(i).size(); ++j){
+                table.changeSelection(i, j, true, false);
+                sizeData -= 1;
+                if (sizeData == 0)
+                    break;
+            }
+            posInRow = 0;
+            if (sizeData == 0)
+                break;
+        }
+    }
+
+    public void eraseSelectedCell(){
+        // Снимаем выделение строк
+        table.clearSelection();
+
+        // Снимаем выделение столбцов (не обязательно, так как clearSelection сбросит все, но для наглядности)
+        ListSelectionModel columnModel = table.getColumnModel().getSelectionModel();
+        columnModel.clearSelection();
     }
 
 }
