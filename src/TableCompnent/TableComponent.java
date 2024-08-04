@@ -8,6 +8,9 @@ import java.util.Enumeration;
 
 import App.App;
 import FileService.FileService;
+import KeyboradActions.CopyAction;
+import KeyboradActions.CutAction;
+import KeyboradActions.PasteAction;
 import TableCompnent.DialogFrame.DialogFrame;
 import TextSearch.SearchSubArray;
 
@@ -147,6 +150,31 @@ public class TableComponent implements ITableComponent {
 
     public void createTable(){
         table = new JTable(tableModel);
+        registerKeyBindings();
+
+    }
+
+    public void registerKeyBindings(){
+        // Создаем действия
+        Action copyAction = new CopyAction(table);
+        Action cutAction = new CutAction(table);
+        Action pasteAction = new PasteAction(table);
+
+        // Регистрация действий для копирования, вырезания и вставки
+        InputMap inputMap = table.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap actionMap = table.getActionMap();
+
+        // Копирование
+        inputMap.put(KeyStroke.getKeyStroke("ctrl C"), "copy");
+        actionMap.put("copy", copyAction);
+
+        // Вырезание
+        inputMap.put(KeyStroke.getKeyStroke("ctrl X"), "cut");
+        actionMap.put("cut", cutAction);
+
+        // Вставка
+        inputMap.put(KeyStroke.getKeyStroke("ctrl V"), "paste");
+        actionMap.put("paste", pasteAction);
     }
 
     public JTable getTable(){
@@ -166,7 +194,7 @@ public class TableComponent implements ITableComponent {
             column.setMaxWidth(40);
         }
         table.setCellSelectionEnabled(true);
-        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION );
     }
 
     public void setWidthTable(int width){
