@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TextSearchComponent {
-    List<Byte> hexValues;
+    List<Integer> hexValues;
     //    List<SearchSubArray> positionsInFile;
     List<SearchSubArray> searchObjects;
     int currentBlockPos = 0;
@@ -32,18 +32,21 @@ public class TextSearchComponent {
                 String data = textSearch.getText();
                 hexValues = StringToBytes(data);
                 searchObjects = app.fs.SearchSubArray(hexValues);
+                if(!searchObjects.isEmpty()){
+                    try {
+                        currentBlockPos = 0;
+                        int indexBlock = searchObjects.get(currentBlockPos).textBlockPos;
+                        app.hexTable.loadContentByIndexBlock(indexBlock);
 
-                try {
-                    currentBlockPos = 0;
-                    int indexBlock = searchObjects.get(currentBlockPos).textBlockPos;
-                    app.hexTable.loadContentByIndexBlock(indexBlock);
+                        app.hexTable.highlightSubText(searchObjects.get(currentBlockPos));
 
-                    app.hexTable.highlightSubText(searchObjects.get(currentBlockPos));
-
-                    searchRes.setText(String.format("%d из %d", currentBlockPos + 1, searchObjects.size()));
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+                        searchRes.setText(String.format("%d из %d", currentBlockPos + 1, searchObjects.size()));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
+                else
+                    searchRes.setText("Совпадений не найдено");
             }
         });
 
@@ -89,8 +92,8 @@ public class TextSearchComponent {
     public void setAppearance() {
     }
 
-    public List<Byte> StringToBytes(String hexString) {
-        hexValues = new ArrayList<Byte>();
+    public List<Integer> StringToBytes(String hexString) {
+        hexValues = new ArrayList<Integer>();
 
         // Регулярное выражение для пары шестнадцатеричных символов
         Pattern pattern = Pattern.compile("([0-9A-Fa-f]{2})");
@@ -98,7 +101,7 @@ public class TextSearchComponent {
 
         // Поиск всех пар шестнадцатеричных символов
         while (matcher.find()) {
-            byte b = app.fs.hexStringToByte(matcher.group());
+            int b = app.fs.hexStringToByte(matcher.group());
             hexValues.add(b);
         }
         return hexValues;

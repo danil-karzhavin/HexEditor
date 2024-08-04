@@ -45,7 +45,7 @@ public class DialogFrame {
         for(int i = 0; i < 8; ++i){
             try{
                 String hex = tableModel.getDataVector().get(row).get(i + col).toString();
-                byte el = FileService.hexStringToByte(hex);
+                byte el = (byte) FileService.hexStringToByte(hex);
                 hexValues += hex + " ";
                 bytes[i] = el;
             }

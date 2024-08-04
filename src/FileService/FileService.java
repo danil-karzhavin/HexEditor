@@ -60,7 +60,7 @@ public class FileService {
         else return content;
     }
 
-    public static String byteToHex(byte b) {
+    public static String byteToHex(int b) {
         // & 0xFF преобразует байт к беззнаковому целому
         // Метод toHexString преобразует это значение в шестнадцатеричную строку
         String hex = Integer.toHexString(b & 0xFF);
@@ -72,7 +72,7 @@ public class FileService {
         return hex.toUpperCase();  // Приводим к верхнему регистру для единства стиля
     }
 
-    public static byte hexStringToByte(String hexString) throws NumberFormatException {
+    public static int hexStringToByte(String hexString) throws NumberFormatException {
         if (hexString == null || hexString.length() != 2) {
             throw new IllegalArgumentException("Строка должна содержать ровно 2 символа.");
         }
@@ -82,7 +82,7 @@ public class FileService {
 
         // Преобразование int в byte (обработка переполнения)
         // Добавляем логическое "и" с 0xFF, чтобы избавиться от возможного знака
-        return (byte)(intValue & 0xFF);
+        return (intValue & 0xFF);
     }
 
     /////// new methods
@@ -96,19 +96,19 @@ public class FileService {
     }
 
     public ArrayList<String> readOneLine(int position) throws IOException{
-        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> oneLine = new ArrayList<String>();
         randomAccessFile.seek(position);
         int b;
         do{
             b = randomAccessFile.read();
             if (b == -1)
                 break;
-            String hexView = byteToHex((byte) b);
-            lines.add(hexView);
+            String hexView = byteToHex(b);
+            oneLine.add(hexView);
         }
-        while ((b > 0) && (b != '\n'));
+        while (b != '\n');
 
-        return lines;
+        return oneLine;
     }
     public long length() throws IOException {
         return randomAccessFile.length();
@@ -150,23 +150,25 @@ public class FileService {
             int b;
             do{
                 b = fin.read();
-                if (b > 0){
-                    if (firstBytePos == null)
-                        firstBytePos = bytePosInFile;
-                    if (numRow == null)
-                        numRow = countRowsInFile;
-
-                    countBytes += 1;
-                    bytePosInFile += 1;
-
+                if (b == -1){
+                    countRows += 1;
+                    throw new IOException();
                 }
 
-                if ( b == '\n' || b <= 0){
+                if (firstBytePos == null)
+                    firstBytePos = bytePosInFile;
+                if (numRow == null)
+                    numRow = countRowsInFile;
+
+                countBytes += 1;
+                bytePosInFile += 1;
+
+                if (b == '\n'){
                     countRows += 1;
                     countRowsInFile += 1;
                 }
 
-                if (countRows >= TableComponent.countLinesInBlock || b <= 0){
+                if (countRows >= TableComponent.countLinesInBlock){
 
                     var newBlock = new TableBlock();
                     newBlock.countBytes = countBytes;
@@ -182,19 +184,23 @@ public class FileService {
                     numRow = null;
                 }
             }
-            while (b > 0);
+            while (true);
 
         } catch (FileNotFoundException ex1) {
             System.out.println(ex1.getMessage());
             // вызвать окно программы, что файл не найден
         } catch (IOException ex2) {
-            System.out.println(ex2.getMessage());
-            // вызвать окно программы, что произошла проблема ввода вывода
+            var newBlock = new TableBlock();
+            newBlock.countBytes = countBytes;
+            newBlock.countRows = countRows;
+            newBlock.firstBytePos = firstBytePos;
+            newBlock.numRow = numRow + 1;
+            blocks.add(newBlock);
         }
         return blocks;
     }
 
-    public List<SearchSubArray> SearchSubArray(List<Byte> data){
+    public List<SearchSubArray> SearchSubArray(List<Integer> data){
         TableComponent tableComponent = app.hexTable;
         ArrayList<SearchSubArray> positions = new ArrayList<SearchSubArray>();
         int countRowsInData = 0;
@@ -211,14 +217,14 @@ public class FileService {
         try (RandomAccessFile fin = new RandomAccessFile(path, "r")){
             int pos = 0, dopPos = 0, numRow = 0, posInCurRow = 0;
             Integer startRowPos = null;
-            Byte byteCur = -1, bytePrev;
+            int byteCur = -1, bytePrev;
 
             do{
                 fin.seek(pos);
 
                 for(var el : data){
                     bytePrev = byteCur;
-                    byteCur = (byte) fin.read(); // читаем байт
+                    byteCur = fin.read(); // читаем байт
 
                     // если байт совпадает с байтов в data, dopPos - количество совпадений
                     if (el == byteCur){
@@ -259,7 +265,7 @@ public class FileService {
                 dopPos = 0;
                 startRowPos = null;
             }
-            while(byteCur > 0);
+            while(byteCur != -1);
         }
         catch (FileNotFoundException ex1) {
             System.out.println(ex1.getMessage());
