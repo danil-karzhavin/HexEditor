@@ -24,7 +24,7 @@ public class TableComponent implements ITableComponent {
     JTable table = null;
     public CustomTableModel tableModel = null;
     JScrollPane scrollPane = null;
-    public App parentObj = null;
+    public App app = null;
     public final static int countLinesInBlock = 100;
     int maxWidthRow = 1;
     boolean loadWasRun = false;
@@ -36,7 +36,7 @@ public class TableComponent implements ITableComponent {
     public JLabel currentPage = null;
 
     public TableComponent(App parentObj){
-        this.parentObj = parentObj;
+        this.app = parentObj;
         this.tableModel = new CustomTableModel();
         createTable();
         columnModel = table.getColumnModel();
@@ -54,6 +54,19 @@ public class TableComponent implements ITableComponent {
                 }
             }
         });
+
+//        tableModel.addTableModelListener(new TableModelListener() {
+//            @Override
+//            public void tableChanged(TableModelEvent e) {
+//                int type = e.getType();
+//                String operationType = "";
+//
+//                if (type == TableModelEvent.INSERT || type == TableModelEvent.UPDATE ||type == TableModelEvent.DELETE){
+//                    blocks.get(TableBlock.currentBlockPos).changed = true;
+//                }
+//
+//            }
+//        });
     }
 
     public void createListeners(){
@@ -62,6 +75,16 @@ public class TableComponent implements ITableComponent {
             public void actionPerformed(ActionEvent e) {
                 if (TableBlock.currentBlockPos > 0){
                     try{
+                        var block = blocks.get(TableBlock.currentBlockPos);
+                        fs.compareBlockWithFile(block);
+                        if (block.changed){
+                            fs.saveChangedBlockInFile(block);
+
+                            int blockPos = TableBlock.currentBlockPos;
+                            app.createFileService(fs.path);
+                            loadContentByIndexBlock(blockPos);
+                        }
+
                         TableBlock.currentBlockPos -= 1;
                         loadContentByIndexBlock(null);
                     }
@@ -77,6 +100,16 @@ public class TableComponent implements ITableComponent {
             public void actionPerformed(ActionEvent e) {
                 if (TableBlock.currentBlockPos < (blocks.size() - 1)){
                     try{
+                        var block = blocks.get(TableBlock.currentBlockPos);
+                        fs.compareBlockWithFile(block);
+                        if (block.changed){
+                            fs.saveChangedBlockInFile(block);
+
+                            int blockPos = TableBlock.currentBlockPos;
+                            app.createFileService(fs.path);
+                            loadContentByIndexBlock(blockPos);
+                        }
+
                         TableBlock.currentBlockPos += 1;
                         loadContentByIndexBlock(null);
                     }
@@ -107,18 +140,6 @@ public class TableComponent implements ITableComponent {
         }
         setAppearance();
         return fs;
-    }
-
-    public void loadContentByIndexBloc(int index) throws IOException{
-        if (index < 0)
-            return;
-        TableBlock.currentBlockPos = index - 2;
-
-        tableModel.eraseDataTable(); // стираем всю таблицу
-
-        //loadNextContent();
-        //loadNextContent();
-
     }
 
     @Override

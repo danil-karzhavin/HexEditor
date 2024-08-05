@@ -8,4 +8,8 @@ public class TableBlock {
     public Integer countBytes = null;
     public Integer countRows = null;
     public Integer numRow = null;
+
+    // отслеживать изменения таблицы
+    public Boolean changed = false;
+    public Integer startPosChanged = null;
 }

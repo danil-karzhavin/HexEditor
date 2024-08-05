@@ -1,6 +1,7 @@
 package App;
 
 import TableCompnent.ITableComponent;
+import TableCompnent.TableBlock;
 import TableCompnent.TableComponent;
 import TextSearch.TextSearchComponent;
 import FileService.FileService;
@@ -51,13 +52,10 @@ public class App extends JFrame {
             public void windowDeactivated(WindowEvent e) { }
             @Override
             public void windowClosing(WindowEvent event) {
-//                if((hexArea.getFileService() == null) || (hexArea.getJtextArea().getText() == hexArea.getFileService().getStringContent()) || hexArea.getJtextArea().getText().length() == 0){
-//                    System.exit(0);
-//                }
-//                else {
-//                    dialogExitComp = new App.DialogExitComponent(App.App.this);
-//                    dialogExitComp.createDialogFrame("Выход");
-//                }
+                var block = hexTable.blocks.get(TableBlock.currentBlockPos);
+                fs.compareBlockWithFile(block);
+                if(block.changed)
+                    fs.saveChangedBlockInFile(block);
                 System.exit(0);
             }
         });
@@ -129,5 +127,9 @@ public class App extends JFrame {
         panel.add(searchBtn);
         panel.add(backBtn);
         panel.add(nextBtn);
+    }
+
+    public void reCreateTableComponent(int blockPos){
+
     }
 }

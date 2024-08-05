@@ -289,4 +289,123 @@ public class FileService {
         }
         return positions;
     }
+
+    public void compareBlockWithFile(TableBlock block){
+        var dataTable = app.hexTable.tableModel.getDataVector();
+        int b = 0, countBytesInBlockFile = 0;
+        int countElInTable = 0;
+
+        try(var fin = new RandomAccessFile(path, "r")){
+            fin.seek(block.firstBytePos);
+
+            for(int i = 0; i < dataTable.size(); ++i){
+                for (int j = 1; j < dataTable.get(i).size(); ++j){
+                    var el = dataTable.get(i).get(j);
+                    if (el == null)
+                        continue;
+
+                    countElInTable += 1;
+
+                    b = fin.read();
+                    countBytesInBlockFile += 1;
+
+                    if (hexStringToByte(el.toString()) != b){
+                        block.changed = true;
+                        block.startPosChanged = block.firstBytePos + countBytesInBlockFile;
+                        return;
+                    }
+
+                    if (countBytesInBlockFile >= block.countBytes){
+                        if (countElInTable != block.countBytes){
+                            block.changed = true;
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+        catch (IOException ex){
+            ex.printStackTrace();
+        }
+
+    }
+
+    public void saveChangedBlockInFile(TableBlock block){
+        TableBlock nextBlock = null;
+        boolean needReadTmpFile = true;
+        try{
+            nextBlock = app.hexTable.blocks.get(TableBlock.currentBlockPos + 1);
+            saveInTmpFile(nextBlock.firstBytePos);
+        }
+        catch (IndexOutOfBoundsException ex){
+            nextBlock = null;
+            needReadTmpFile = false;
+        }
+
+        var dataTable = app.hexTable.tableModel.getDataVector();
+
+        try(var fin = new RandomAccessFile(path, "rw")){
+            fin.setLength(block.firstBytePos);
+            fin.seek(block.firstBytePos);
+
+            // сохраняем изменные данные из таблицы
+            for(int i = 0; i < dataTable.size(); ++i){
+                for (int j = 1; j < dataTable.get(i).size(); ++j) {
+                    var el = dataTable.get(i).get(j);
+
+                    if (el == null)
+                        continue;
+
+                    int value = hexStringToByte(el.toString());
+                    fin.write(value);
+                }
+            }
+            if (needReadTmpFile){
+                // переносим данные из файла
+                readFromTmpFile(fin);
+            }
+            fin.getFD().sync();
+            block.changed = false;
+        }
+        catch (IOException ex2){
+
+        }
+    }
+
+    public void saveInTmpFile(int offset){
+        int b = 0;
+        try(var fin = new RandomAccessFile(path, "r")){
+            fin.seek(offset);
+
+            try(var tmpFile = new FileOutputStream("tmpFile", false)){
+                while(true){
+                    b = fin.read();
+                    if (b == -1)
+                        throw new EOFException();
+                    tmpFile.write(b);
+                }
+            }
+        }
+        catch (EOFException ex1){
+        }
+        catch (IOException ex2){
+        }
+    }
+
+    public void readFromTmpFile(RandomAccessFile fin){
+        try(var tmpFile = new FileInputStream("tmpFile")){
+            int b = 0;
+            do{
+                b = tmpFile.read();
+                if (b == -1)
+                    throw new EOFException();
+
+                fin.write(b);
+            }
+            while(b != -1);
+        }
+        catch (IOException ex){
+
+        };
+    }
 }

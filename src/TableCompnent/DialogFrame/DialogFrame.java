@@ -31,7 +31,7 @@ public class DialogFrame {
                 "4 байт как вещественное число одинарной точности: " + String.valueOf(bytesToFloat()),
                 "8 байт как вещественное число двойной точности: " + String.valueOf(bytesToDouble())};
 
-        JOptionPane.showMessageDialog(tableComponent.parentObj, data, "Отображение блока байт", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(tableComponent.app, data, "Отображение блока байт", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void setAppearance(){
