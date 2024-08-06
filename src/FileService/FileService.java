@@ -345,7 +345,7 @@ public class FileService {
         var dataTable = app.hexTable.tableModel.getDataVector();
 
         try(var fin = new RandomAccessFile(path, "rw")){
-            fin.setLength(block.firstBytePos);
+            fin.setLength(block.firstBytePos); // обрезаем файл
             fin.seek(block.firstBytePos);
 
             // сохраняем изменные данные из таблицы
@@ -407,5 +407,63 @@ public class FileService {
         catch (IOException ex){
 
         };
+    }
+
+    public int getPositionByRowCol(int row, int col){
+        int position = 0, b = 0;
+        int curRow = 0, curCol = 0;
+        try(var fin = new RandomAccessFile(path, "r")){
+            while (curRow <= row){
+                b = fin.read();
+                if (b == -1)
+                    throw new EOFException();
+                curCol += 1;
+
+                if (b == '\n'){
+                    curRow += 1;
+                    curCol = 0;
+                }
+                position += 1;
+                if (curRow == row && curCol == col){
+                    return position;
+                }
+            }
+        }
+        catch (IOException ex){
+
+        }
+        return 0;
+    }
+
+    public void savePasteBytesInFile(int row, int col, List<Integer> bytes){
+        int position = getPositionByRowCol(row, col);
+        saveInTmpFile(position);
+
+        try(var fin = new RandomAccessFile(path, "rw")){
+            fin.setLength(position);
+            fin.seek(position);
+
+            for(int i = 0; i < bytes.size(); ++i){
+                int value = bytes.get(i);
+                fin.write(value);
+            }
+
+            readFromTmpFile(fin);
+        }
+        catch (IOException ex){
+
+        }
+    }
+
+    public void saveCutBytesInFile(int position, int cutLength){
+        saveInTmpFile(position + cutLength);
+
+        try(var fin = new RandomAccessFile(path, "r")){
+            fin.setLength(position);
+            readFromTmpFile(fin);
+        }
+        catch (IOException ex){
+
+        }
     }
 }

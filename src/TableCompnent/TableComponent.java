@@ -54,19 +54,6 @@ public class TableComponent implements ITableComponent {
                 }
             }
         });
-
-//        tableModel.addTableModelListener(new TableModelListener() {
-//            @Override
-//            public void tableChanged(TableModelEvent e) {
-//                int type = e.getType();
-//                String operationType = "";
-//
-//                if (type == TableModelEvent.INSERT || type == TableModelEvent.UPDATE ||type == TableModelEvent.DELETE){
-//                    blocks.get(TableBlock.currentBlockPos).changed = true;
-//                }
-//
-//            }
-//        });
     }
 
     public void createListeners(){
@@ -83,6 +70,7 @@ public class TableComponent implements ITableComponent {
                             int blockPos = TableBlock.currentBlockPos;
                             app.createFileService(fs.path);
                             loadContentByIndexBlock(blockPos);
+                            // как я реализую вставку: по таблице вычисляю позицию байта в файле, вставляю сразу туда данные и пересоздаю FileService
                         }
 
                         TableBlock.currentBlockPos -= 1;
@@ -179,7 +167,7 @@ public class TableComponent implements ITableComponent {
         // Создаем действия
         Action copyAction = new CopyAction(table);
         Action cutAction = new CutAction(table);
-        Action pasteAction = new PasteAction(table);
+        Action pasteAction = new PasteAction(this);
 
         // Регистрация действий для копирования, вырезания и вставки
         InputMap inputMap = table.getInputMap(JComponent.WHEN_FOCUSED);
@@ -215,7 +203,7 @@ public class TableComponent implements ITableComponent {
             column.setMaxWidth(40);
         }
         table.setCellSelectionEnabled(true);
-        table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION );
+        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION );
     }
 
     public void setWidthTable(int width){
