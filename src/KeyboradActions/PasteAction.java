@@ -43,9 +43,12 @@ public class PasteAction extends AbstractAction {
             // Если выделена одна ячейка
             int row = selectedRows[0];
             int col = selectedColumns[0];
+            if (col == 0)
+                return;
+
             int rowInFile = Integer.parseInt(table.tableModel.getDataVector().get(row).get(0).toString()) - 1;
             int posInRow = col - 1;
-            int position = table.fs.getPositionByRowCol(row, col);
+            int position = table.fs.getPositionByRowCol(rowInFile, posInRow) + 1; // т.к. ячейку не затираем
             table.fs.savePasteBytesInFile(position, hexValues);
 
             int blockPos = TableBlock.currentBlockPos;
@@ -59,14 +62,29 @@ public class PasteAction extends AbstractAction {
 
             System.out.println("Single cell selected at ()");
         } else if (selectedRows.length > 0 && selectedColumns.length > 0) {
-            // Если выделено несколько ячеек
             int firstRow = selectedRows[0];
             int endRow = selectedRows[selectedRows.length - 1];
             int firstCol = selectedColumns[0];
             int endCol = selectedColumns[selectedColumns.length - 1];
+            if (firstCol == 0 || endCol == 0)
+                return;
 
+            int startRowInFile = Integer.parseInt(table.tableModel.getDataVector().get(firstRow).get(0).toString()) - 1;
+            int startColInFile = firstCol - 1;
+            int endRowInFile = Integer.parseInt(table.tableModel.getDataVector().get(endRow).get(0).toString()) - 1;
 
+            int position = table.fs.getPositionByRowCol(startRowInFile, startColInFile);
+            int cutLength = table.tableModel.getLengthSelectBlock(startRowInFile, firstCol, endRowInFile, endCol);
+            table.fs.removeCutBytesInFile(position, cutLength);
+            table.fs.savePasteBytesInFile(position, hexValues);
 
+            int blockPos = TableBlock.currentBlockPos;
+            table.app.createFileService(table.fs.path);
+            try {
+                table.loadContentByIndexBlock(blockPos);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         } else {
             // Если ячейки не выделены
             System.out.println("No cells selected");
