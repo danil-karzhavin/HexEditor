@@ -435,8 +435,7 @@ public class FileService {
         return 0;
     }
 
-    public void savePasteBytesInFile(int row, int col, List<Integer> bytes){
-        int position = getPositionByRowCol(row, col);
+    public void savePasteBytesInFile(int position, List<Integer> bytes){
         saveInTmpFile(position);
 
         try(var fin = new RandomAccessFile(path, "rw")){
@@ -455,11 +454,12 @@ public class FileService {
         }
     }
 
-    public void saveCutBytesInFile(int position, int cutLength){
+    public void removeCutBytesInFile(int position, int cutLength){
         saveInTmpFile(position + cutLength);
 
-        try(var fin = new RandomAccessFile(path, "r")){
+        try(var fin = new RandomAccessFile(path, "rw")){
             fin.setLength(position);
+            fin.seek(position);
             readFromTmpFile(fin);
         }
         catch (IOException ex){

@@ -1,45 +1,103 @@
 package KeyboradActions;
 
+import TableCompnent.TableBlock;
+import TableCompnent.TableComponent;
+
 import javax.swing.*;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
+import java.io.IOException;
 
 public class CutAction extends AbstractAction {
-    private JTable table;
+    private TableComponent table;
 
-    public CutAction(JTable table) {
+    public CutAction(TableComponent table) {
         this.table = table;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        int[] selectedRows = table.getSelectedRows();
-        int[] selectedColumns = table.getSelectedColumns();
+        int[] selectedRows = table.getTable().getSelectedRows();
+        int[] selectedColumns = table.getTable().getSelectedColumns();
 
-        if (selectedRows.length == 0 || selectedColumns.length == 0) {
-            return;
-        }
+        if (selectedRows.length == 1 && selectedColumns.length == 1) {
+            // Если выделена одна ячейка
+            int row = selectedRows[0];
+            int col = selectedColumns[0];
 
-        StringBuilder sb = new StringBuilder();
+            int rowInFile = Integer.parseInt(table.tableModel.getDataVector().get(row).get(0).toString()) - 1;
+            int posInRow = col - 1;
+            int cutLength = 1;
 
-        for (int row : selectedRows) {
-            for (int col : selectedColumns) {
-                Object cellValue = table.getValueAt(row, col);
-                sb.append(cellValue == null ? "" : cellValue.toString());
-                sb.append("\t");
+            int position = table.fs.getPositionByRowCol(rowInFile, posInRow);
+            table.fs.removeCutBytesInFile(position, cutLength);
 
-                // Обнуляем ячейку после вырезания
-                table.setValueAt(null, row, col);
+            int blockPos = TableBlock.currentBlockPos;
+            table.app.createFileService(table.fs.path);
+            try {
+                table.loadContentByIndexBlock(blockPos);
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
-            sb.setLength(sb.length() - 1);
-            sb.append("\n");
-        }
 
-        StringSelection stringSelection = new StringSelection(sb.toString());
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(stringSelection, null);
+
+            System.out.println("Single cell selected at ()");
+        } else if (selectedRows.length > 0 && selectedColumns.length > 0) {
+            // Если выделено несколько ячеек
+            int firstRow = selectedRows[0];
+            int endRow = selectedRows[selectedRows.length - 1];
+            int firstCol = selectedColumns[0];
+            int endCol = selectedColumns[selectedColumns.length - 1];
+
+            int startRowInFile = Integer.parseInt(table.tableModel.getDataVector().get(firstRow).get(0).toString()) - 1;
+            int startColInFile = firstCol - 1;
+            int endRowInFile = Integer.parseInt(table.tableModel.getDataVector().get(endRow).get(0).toString()) - 1;
+            int endColInFile = endCol - 1;
+
+            int position = table.fs.getPositionByRowCol(startRowInFile, startColInFile);
+            int cutLength = getLengthSelectBlock(startRowInFile, firstCol, endRowInFile, endCol);
+            table.fs.removeCutBytesInFile(position, cutLength);
+
+            int blockPos = TableBlock.currentBlockPos;
+            table.app.createFileService(table.fs.path);
+            try {
+                table.loadContentByIndexBlock(blockPos);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+        } else {
+            // Если ячейки не выделены
+            System.out.println("No cells selected");
+        }
+    }
+
+    public int getLengthSelectBlock(int startRow, int startCol, int endRow, int endCol){
+        var data = table.tableModel.getDataVector();
+        int countRes = 0;
+
+        if (startRow < endRow)
+            for(int i = startRow; i <= startRow; ++i)
+                for(int j = startCol; j < data.get(i).size(); ++j){
+                    var el = data.get(i).get(j);
+                    if (el != null)
+                        countRes += 1;
+                }
+
+
+        for(int i = startRow + 1; i < endRow; ++i)
+            for(int j = 1; j < data.get(i).size(); ++j){
+                var el = data.get(i).get(j);
+                if (el != null)
+                    countRes += 1;
+            }
+
+        for(int i = endRow; i <= endRow; ++i)
+            for(int j = 1; j <= endCol; ++j){
+                var el = data.get(i).get(j);
+                if (el != null)
+                    countRes += 1;
+            }
+
+        return countRes;
     }
 }

@@ -45,7 +45,8 @@ public class PasteAction extends AbstractAction {
             int col = selectedColumns[0];
             int rowInFile = Integer.parseInt(table.tableModel.getDataVector().get(row).get(0).toString()) - 1;
             int posInRow = col - 1;
-            table.fs.savePasteBytesInFile(rowInFile, posInRow, hexValues);
+            int position = table.fs.getPositionByRowCol(row, col);
+            table.fs.savePasteBytesInFile(position, hexValues);
 
             int blockPos = TableBlock.currentBlockPos;
             table.app.createFileService(table.fs.path);

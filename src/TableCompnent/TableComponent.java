@@ -166,7 +166,7 @@ public class TableComponent implements ITableComponent {
     public void registerKeyBindings(){
         // Создаем действия
         Action copyAction = new CopyAction(table);
-        Action cutAction = new CutAction(table);
+        Action cutAction = new CutAction(this);
         Action pasteAction = new PasteAction(this);
 
         // Регистрация действий для копирования, вырезания и вставки
