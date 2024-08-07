@@ -8,7 +8,7 @@ import javax.swing.*;
 
 public class DialogFrame {
     int row, col;
-    public byte[] bytes;
+    public int[] bytes;
     public String hexValues = "";
 
     TableComponent tableComponent;
@@ -40,14 +40,21 @@ public class DialogFrame {
 
     public void readBytes(){
         CustomTableModel tableModel = tableComponent.tableModel;
+        var data = tableModel.getDataVector();
+        int curCol = col, curRow = row;
 
-        bytes = new byte[8];
-        for(int i = 0; i < 8; ++i){
+        bytes = new int[8];
+        for(int i = 0; i < 8; ++i, ++curCol){
             try{
-                String hex = tableModel.getDataVector().get(row).get(i + col).toString();
-                byte el = (byte) FileService.hexStringToByte(hex);
+                String hex = data.get(curRow).get(curCol).toString();
+                int el = FileService.hexStringToByte(hex);
                 hexValues += hex + " ";
                 bytes[i] = el;
+
+                if (el == 10){
+                    curRow += 1;
+                    curCol = 1;
+                }
             }
             catch(IllegalArgumentException ex){
                 ex.printStackTrace();
@@ -59,7 +66,7 @@ public class DialogFrame {
     }
 
     public char bytesToChar(){
-        byte[] arr = new byte[2];
+        int[] arr = new int[2];
 
         for(int i = 0; i < arr.length; ++i)
             arr[i] = bytes[i];
@@ -68,7 +75,7 @@ public class DialogFrame {
     }
 
     public int bytesToUnSignValue(){
-        byte[] arr = new byte[2];
+        int[] arr = new int[2];
 
         for(int i = 0; i < arr.length; ++i)
             arr[i] = bytes[i];
@@ -77,7 +84,7 @@ public class DialogFrame {
                 (arr[1] & 0xFF));
     }
     public short bytesToSignValue(){
-        byte[] arr = new byte[2];
+        int[] arr = new int[2];
 
         for(int i = 0; i < arr.length; ++i)
             arr[i] = bytes[i];
@@ -87,7 +94,7 @@ public class DialogFrame {
     }
 
     public int bytesToSignInt(){
-        byte[] arr = new byte[4];
+        int[] arr = new int[4];
 
         for(int i = 0; i < arr.length; ++i)
             arr[i] = bytes[i];
@@ -99,7 +106,7 @@ public class DialogFrame {
     }
 
     public long bytesToUnSignInt(){
-        byte[] arr = new byte[4];
+        int[] arr = new int[4];
 
         for(int i = 0; i < arr.length; ++i)
             arr[i] = bytes[i];
