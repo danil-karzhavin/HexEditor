@@ -19,7 +19,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 public class TableComponent implements ITableComponent {
-    public int counter = 0;
     public FileService fs = null;
     JTable table = null;
     public CustomTableModel tableModel = null;
@@ -27,7 +26,6 @@ public class TableComponent implements ITableComponent {
     public App app = null;
     public final static int countLinesInBlock = 100;
     int maxWidthRow = 1;
-    boolean loadWasRun = false;
     // Модель столбцов таблицы
     private TableColumnModel columnModel;
     public ArrayList<TableBlock> blocks;
@@ -250,9 +248,6 @@ public class TableComponent implements ITableComponent {
             if (sizeData == 0)
                 break;
         }
-
-//        table.addRowSelectionInterval(startRow, endRow);
-//        table.addColumnSelectionInterval(startCol, endCol);
     }
 
     public void eraseSelectedCell(){

@@ -28,14 +28,6 @@ public class CustomTableModel extends DefaultTableModel {
         data.clear();
     }
 
-    public int getCountBytesInTable(){
-        int countBytes = 0;
-        for (var row : getDataVector()){
-            countBytes += (row.size() - 1);
-        }
-        return countBytes;
-    }
-
     public int getLengthSelectBlock(int startRow, int startCol, int endRow, int endCol){
         var data = getDataVector();
         int countRes = 0;

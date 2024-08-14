@@ -14,9 +14,6 @@ public class FileService {
     public int countLines = 0;
     public App app;
 
-    // массив байтов исходного файла
-    private byte[] content = new byte[0];
-
 
     RandomAccessFile randomAccessFile;
 
@@ -30,34 +27,6 @@ public class FileService {
             // throw exception
         }
         this.path = path;
-    }
-
-    public byte[] getContent(){
-        if (content.length == 0) {
-            ArrayList<Byte> arrayBytes = new ArrayList<Byte>();
-
-            try (FileInputStream fin = new FileInputStream(path)) {
-                int oneByte;
-
-                // читаем пока в потоке есть данные
-                while ((oneByte = fin.read()) != -1) {
-                    arrayBytes.add((byte) oneByte);
-                }
-            } catch (FileNotFoundException ex1) {
-                System.out.println(ex1.getMessage());
-                // вызвать окно программы, что файл не найден
-            } catch (IOException ex2) {
-                System.out.println(ex2.getMessage());
-                // вызвать окно программы, что произошла проблема ввода вывода
-            }
-
-            content = new byte[arrayBytes.size()];
-            for (int i = 0; i < arrayBytes.size(); ++i) {
-                content[i] = arrayBytes.get(i);
-            }
-            return content;
-        }
-        else return content;
     }
 
     public static String byteToHex(int b) {
@@ -85,7 +54,6 @@ public class FileService {
         return (intValue & 0xFF);
     }
 
-    /////// new methods
     public void largeFileReader(){
         try{
             this.randomAccessFile = new RandomAccessFile(path, "r");

@@ -70,7 +70,6 @@ public class App extends JFrame {
         createTextSearchComponent();
         setComponents();
 
-        //add(panel);
         pack();
         setContentPane(panel);
         setSize(1200, 800);
@@ -96,7 +95,6 @@ public class App extends JFrame {
     void createTableComponent(){
         hexTable = new TableComponent(this);
 
-        //panel.add(hexTable.getScrollPaneTableComponent());
         prevPageBtn = new JButton("Предыдущая страница");
         currentPage = new JLabel("1 из ...");
         nextPageBtn = new JButton("Следующая страница");
@@ -104,10 +102,6 @@ public class App extends JFrame {
         hexTable.prevPageBtn = prevPageBtn;
         hexTable.nextPageBtn = nextPageBtn;
         hexTable.currentPage = currentPage;
-
-//        panel.add(prevPageBtn);
-//        panel.add(currentPage);
-//        panel.add(nextPageBtn);
 
         hexTable.createListeners();
     }
@@ -127,12 +121,6 @@ public class App extends JFrame {
         textSearchComp.backBtn = backBtn;
         textSearchComp.nextBtn = nextBtn;
         textSearchComp.createListeners();
-
-//        panel.add(textSearch);
-//        panel.add(searchRes);
-//        panel.add(searchBtn);
-//        panel.add(backBtn);
-//        panel.add(nextBtn);
     }
 
     void setComponents(){
