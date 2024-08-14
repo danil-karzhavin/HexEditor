@@ -115,6 +115,7 @@ public class TableComponent implements ITableComponent {
         scrollPane = new JScrollPane(table,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         return scrollPane;
     }
 
@@ -161,6 +162,7 @@ public class TableComponent implements ITableComponent {
 
     public void createTable(){
         table = new JTable(tableModel);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         registerKeyBindings();
 
     }

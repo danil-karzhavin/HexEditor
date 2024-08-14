@@ -8,7 +8,7 @@ import FileService.FileService;
 
 public class MenuBar extends JFrame {
     App app;
-    JMenuItem open, save, saveAnotherFile;
+    JMenuItem open;
 
     public MenuBar(App app){
         this.app = app;
@@ -25,14 +25,9 @@ public class MenuBar extends JFrame {
         // Пункт меню "Открыть" с изображением
         open = new JMenuItem("Открыть",
                 new ImageIcon("images/open.png"));
-        save = new JMenu("Сохранить");
-        saveAnotherFile = new JMenu("Сохранить в другой файл");
-
 
         // Добавим в меню пункты open and exit
         file.add(open);
-        file.add(save);
-        file.add(saveAnotherFile);
 
         open.addActionListener(new ActionListener()
         {
@@ -53,20 +48,6 @@ public class MenuBar extends JFrame {
                 catch (IOException ex){
                     ex.printStackTrace();
                 }
-            }
-        });
-
-        save.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // save file
-            }
-        });
-
-        saveAnotherFile.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e){
-                // save another file
             }
         });
         return file;
