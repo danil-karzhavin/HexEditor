@@ -13,7 +13,7 @@ public interface ITableComponent {
     public FileService createFileService(FileService fs);
     public void loadContentByIndexBlock(Integer index) throws IOException;
 
-    public JScrollPane getScrollPaneTableComponent();
+    public JScrollPane createScrollPaneTableComponent();
 
     public void createTable();
 }

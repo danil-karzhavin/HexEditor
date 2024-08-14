@@ -23,7 +23,7 @@ public class TableComponent implements ITableComponent {
     public FileService fs = null;
     JTable table = null;
     public CustomTableModel tableModel = null;
-    JScrollPane scrollPane = null;
+    public JScrollPane scrollPane;
     public App app = null;
     public final static int countLinesInBlock = 100;
     int maxWidthRow = 1;
@@ -40,6 +40,8 @@ public class TableComponent implements ITableComponent {
         this.tableModel = new CustomTableModel();
         createTable();
         columnModel = table.getColumnModel();
+
+        createScrollPaneTableComponent();
 
         table.addMouseListener(new MouseAdapter() {
             @Override
@@ -109,8 +111,8 @@ public class TableComponent implements ITableComponent {
         });
     }
 
-    public JScrollPane getScrollPaneTableComponent(){
-        JScrollPane scrollPane = new JScrollPane(table,
+    public JScrollPane createScrollPaneTableComponent(){
+        scrollPane = new JScrollPane(table,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         return scrollPane;
