@@ -11,7 +11,6 @@ import java.util.List;
 
 public class FileService {
     public static String path;
-    public int countLines = 0;
     public App app;
 
 
@@ -87,20 +86,31 @@ public class FileService {
     }
 
     public int getMaxWidthRow() throws IOException {
-        int maxWidth = 0;
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-            String line;
-            maxWidth = 0;
-            while ((line = reader.readLine()) != null) {
-                countLines += 1;
-                if (line.length() > maxWidth)
-                    maxWidth = line.length();
+        int maxWidth = 0, b = 0, rowLen = 0;
+        try (BufferedInputStream reader = new BufferedInputStream(new FileInputStream(path))) {
+            while(true){
+                b = reader.read();
+                if (b == -1){
+                    if (rowLen > maxWidth)
+                        maxWidth = rowLen;
+                    throw new EOFException();
+                }
+                rowLen += 1;
+
+                if (b == '\n'){
+                    if (rowLen > maxWidth)
+                        maxWidth = rowLen;
+                    rowLen = 0;
+                }
             }
-        } catch (IOException ex) {
+
+        } catch (EOFException ex) {
+        }
+        catch (IOException ex) {
             ex.printStackTrace();
         }
         System.out.println(maxWidth);
-        return maxWidth + 2;
+        return maxWidth;
     }
 
     public ArrayList<TableBlock> setBlockStatistics(){
