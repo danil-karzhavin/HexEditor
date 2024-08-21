@@ -23,6 +23,8 @@ public class DialogFrame {
 
     public void createDialog(){
         String[] data = new String[]{"Считанные блок: " + hexValues,
+                "1 байт как число со знаком: " + String.valueOf(byteToSignInt()),
+                "1 байт как число без знака: " + String.valueOf(byteToUnSignInt()),
                 "2 байт как символ char: " + String.valueOf(bytesToChar()),
                 "2 байт как число без знака: " + String.valueOf(bytesToUnSignValue()),
                 "2 байт как число со знаком: " + String.valueOf(bytesToSignValue()),
@@ -63,6 +65,16 @@ public class DialogFrame {
                 return;
             }
         }
+    }
+
+    public int byteToUnSignInt(){
+        int element = bytes[0];
+        return (int) element;
+    }
+
+    public int byteToSignInt(){
+        byte element = (byte) bytes[0];
+        return (int) element;
     }
 
     public char bytesToChar(){
