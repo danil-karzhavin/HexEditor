@@ -35,4 +35,27 @@ public class HexTools {
         // Добавляем логическое "и" с 0xFF, чтобы избавиться от возможного знака
         return (intValue & 0xFF);
     }
+
+    // Метод для проверки, является ли строка корректным шестнадцатеричным значением байта
+    public static boolean isValidHexByte(String str) {
+        // Проверяем, что строка имеет ровно 2 символа
+        if (str == null || str.length() != 2) {
+            return false;
+        }
+
+        // Проверяем каждый символ, является ли он корректным шестнадцатеричным символом
+        for (char ch : str.toCharArray()) {
+            if (!isHexChar(ch)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Метод проверки, является ли символ корректным шестнадцатеричным символом
+    private static boolean isHexChar(char ch) {
+        return (ch >= '0' && ch <= '9') ||
+                (ch >= 'A' && ch <= 'F');
+    }
 }

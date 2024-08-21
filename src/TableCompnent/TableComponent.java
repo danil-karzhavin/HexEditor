@@ -15,8 +15,15 @@ import TableCompnent.DialogFrame.DialogFrame;
 import TextSearch.SearchSubArray;
 
 import javax.swing.*;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+
+import static HexTools.HexTools.isValidHexByte;
 
 public class TableComponent implements ITableComponent {
     public FileService fs = null;
@@ -26,6 +33,7 @@ public class TableComponent implements ITableComponent {
     public App app = null;
     public static int countLinesInBlock = 100;
     public static int countColumnsInBlock = 0;
+    public String oldCellValue;
     int maxWidthRow = 0;
     // Модель столбцов таблицы
     private TableColumnModel columnModel;
@@ -53,6 +61,24 @@ public class TableComponent implements ITableComponent {
 
                     if (row != -1 && col != -1) {
                         new DialogFrame(TableComponent.this, row, col);
+                    }
+                }
+            }
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Проверяем, если это двойной клик
+                if (e.getClickCount() == 1) {
+                    // Получаем индекс выделенной строки и колонки
+                    int row = table.rowAtPoint(e.getPoint());
+                    int column = table.columnAtPoint(e.getPoint());
+
+                    // Выполняем действие на двойной клик
+                    if (row >= 0 && column >= 0) {
+                        Object value = table.getValueAt(row, column);
+                        if (value != null){
+                            oldCellValue = value.toString();
+                            // System.out.println(oldCellValue);
+                        }
                     }
                 }
             }
@@ -144,6 +170,22 @@ public class TableComponent implements ITableComponent {
                     }
                     catch (Exception ex){
                         ex.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        tableModel.addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                if (e.getType() == TableModelEvent.UPDATE) {
+                    int row = e.getFirstRow();
+                    int column = e.getColumn();
+                    if (row >=0 && column >= 0){
+                        Object updatedValue = tableModel.getValueAt(row, column);
+                        if (!isValidHexByte(updatedValue.toString()))
+                            tableModel.setValueAt(oldCellValue, row, column);
+                        // System.out.println("Table updated at row: " + row + ", column: " + column + " with value: " + updatedValue);
                     }
                 }
             }

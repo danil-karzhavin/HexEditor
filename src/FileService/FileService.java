@@ -109,7 +109,7 @@ public class FileService {
         catch (IOException ex) {
             ex.printStackTrace();
         }
-        System.out.println(maxWidth);
+        // System.out.println(maxWidth);
         return maxWidth;
     }
 
