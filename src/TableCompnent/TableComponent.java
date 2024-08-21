@@ -24,14 +24,17 @@ public class TableComponent implements ITableComponent {
     public CustomTableModel tableModel = null;
     public JScrollPane scrollPane;
     public App app = null;
-    public final static int countLinesInBlock = 100;
-    int maxWidthRow = 1;
+    public static int countLinesInBlock = 100;
+    public static int countColumnsInBlock = 0;
+    int maxWidthRow = 0;
     // Модель столбцов таблицы
     private TableColumnModel columnModel;
     public ArrayList<TableBlock> blocks;
 
     public JButton nextPageBtn = null, prevPageBtn = null;
     public JLabel currentPage = null;
+    public JTextField sizeRows, sizeColumns;
+    public JButton apply;
 
     public TableComponent(App parentObj){
         this.app = parentObj;
@@ -107,6 +110,44 @@ public class TableComponent implements ITableComponent {
                 }
             }
         });
+
+        apply.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    if (sizeRows.getText() != null && sizeRows.getText() != ""){
+                        int value = Integer.parseInt(sizeRows.getText());
+                        if (value <= 0)
+                           throw new NumberFormatException();
+                        countLinesInBlock = value;
+                    }
+                }
+                catch (NumberFormatException ex){
+                    sizeRows.setText("Некорр. значение для строк");
+                }
+
+                try{
+                    if (sizeColumns.getText() != null && sizeColumns.getText() != ""){
+                        int value = Integer.parseInt(sizeColumns.getText());
+                        if (value <= 0)
+                            throw new NumberFormatException();
+                        countColumnsInBlock = value;
+                    }
+                }
+                catch (NumberFormatException ex){
+                    sizeColumns.setText("Некорр. значение для столбцов");
+                }
+                if (fs.path != null){
+                    app.createFileService(fs.path);
+                    try{
+                        loadContentByIndexBlock(0);
+                    }
+                    catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     public JScrollPane createScrollPaneTableComponent(){
@@ -122,6 +163,13 @@ public class TableComponent implements ITableComponent {
         this.fs = fs;
         try {
             maxWidthRow = fs.getMaxWidthRow(); // нельзя вызывать больше одного раза
+            if (maxWidthRow <= countColumnsInBlock){
+                maxWidthRow = countColumnsInBlock;
+            }
+            else if (countColumnsInBlock != 0){
+                sizeColumns.setText("Значение не может быть меньше самой длинной строки в файле");
+            }
+
             blocks = fs.setBlockStatistics();
         }
         catch (IOException ex){

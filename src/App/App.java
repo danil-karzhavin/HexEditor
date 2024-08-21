@@ -8,6 +8,7 @@ import FileService.FileService;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -28,6 +29,9 @@ public class App extends JFrame {
     JLabel searchRes = null;
     JButton searchBtn, backBtn, nextBtn;
     TextSearchComponent textSearchComp;
+
+    JTextField sizeRows, sizeColumns;
+    JButton apply;
 
     public static void main(String[] args) {
         // Подключение украшений для окон
@@ -99,9 +103,21 @@ public class App extends JFrame {
         currentPage = new JLabel("1 из ...");
         nextPageBtn = new JButton("Следующая страница");
 
+        sizeRows = new JTextField("", 10);
+        sizeRows.setMinimumSize(new Dimension(100, 20));
+        sizeRows.setMaximumSize(new Dimension(300, 20));
+        sizeColumns = new JTextField(10);
+        sizeColumns.setMinimumSize(new Dimension(100, 20));
+        sizeColumns.setMaximumSize(new Dimension(300, 20));
+        apply = new JButton("Применить");
+
         hexTable.prevPageBtn = prevPageBtn;
         hexTable.nextPageBtn = nextPageBtn;
         hexTable.currentPage = currentPage;
+
+        hexTable.sizeRows = sizeRows;
+        hexTable.sizeColumns = sizeColumns;
+        hexTable.apply = apply;
 
         hexTable.createListeners();
     }
@@ -133,6 +149,10 @@ public class App extends JFrame {
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(hexTable.scrollPane) // Первая строка
                         .addGroup(layout.createSequentialGroup()
+                                .addComponent(sizeRows)
+                                .addComponent(sizeColumns)
+                                .addComponent(apply))
+                        .addGroup(layout.createSequentialGroup()
                                 .addComponent(prevPageBtn)
                                 .addComponent(currentPage)
                                 .addComponent(nextPageBtn)) // Вторая строка
@@ -148,7 +168,11 @@ public class App extends JFrame {
         // Определение вертикальной группы
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(hexTable.scrollPane) // Первая строка
+                        .addComponent(hexTable.scrollPane)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(sizeRows)
+                                .addComponent(sizeColumns)
+                                .addComponent(apply))// Первая строка
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(prevPageBtn)
                                 .addComponent(currentPage)
