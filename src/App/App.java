@@ -30,6 +30,7 @@ public class App extends JFrame {
     JButton searchBtn, backBtn, nextBtn;
     TextSearchComponent textSearchComp;
 
+    JLabel changeNumRows, changeNumColumns;
     JTextField sizeRows, sizeColumns;
     JButton apply;
 
@@ -103,13 +104,16 @@ public class App extends JFrame {
         currentPage = new JLabel("1 из ...");
         nextPageBtn = new JButton("Следующая страница");
 
-        sizeRows = new JTextField("", 10);
-        sizeRows.setMinimumSize(new Dimension(100, 20));
-        sizeRows.setMaximumSize(new Dimension(300, 20));
-        sizeColumns = new JTextField(10);
-        sizeColumns.setMinimumSize(new Dimension(100, 20));
-        sizeColumns.setMaximumSize(new Dimension(300, 20));
+        sizeRows = new JTextField();
+//        sizeRows.setMinimumSize(new Dimension(100, 20));
+//        sizeRows.setMaximumSize(new Dimension(300, 20));
+        sizeColumns = new JTextField();
+//        sizeColumns.setMinimumSize(new Dimension(100, 20));
+//        sizeColumns.setMaximumSize(new Dimension(300, 20));
         apply = new JButton("Применить");
+
+        changeNumRows = new JLabel("Изменить количество строк: ");
+        changeNumColumns = new JLabel("Изменить количество столбцов: ");
 
         hexTable.prevPageBtn = prevPageBtn;
         hexTable.nextPageBtn = nextPageBtn;
@@ -149,7 +153,9 @@ public class App extends JFrame {
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(hexTable.scrollPane) // Первая строка
                         .addGroup(layout.createSequentialGroup()
+                                .addComponent(changeNumRows)
                                 .addComponent(sizeRows)
+                                .addComponent(changeNumColumns)
                                 .addComponent(sizeColumns)
                                 .addComponent(apply))
                         .addGroup(layout.createSequentialGroup()
@@ -170,9 +176,11 @@ public class App extends JFrame {
                 layout.createSequentialGroup()
                         .addComponent(hexTable.scrollPane)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(changeNumRows)
                                 .addComponent(sizeRows)
+                                .addComponent(changeNumColumns)
                                 .addComponent(sizeColumns)
-                                .addComponent(apply))// Первая строка
+                                .addComponent(apply))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(prevPageBtn)
                                 .addComponent(currentPage)
