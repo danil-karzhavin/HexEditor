@@ -61,10 +61,12 @@ public class App extends JFrame {
             public void windowDeactivated(WindowEvent e) { }
             @Override
             public void windowClosing(WindowEvent event) {
-                var block = hexTable.blocks.get(TableBlock.currentBlockPos);
-                fs.compareBlockWithFile(block);
-                if(block.changed)
-                    fs.saveChangedBlockInFile(block);
+                if (fs != null){
+                    var block = hexTable.blocks.get(TableBlock.currentBlockPos);
+                    fs.compareBlockWithFile(block);
+                    if(block.changed)
+                        fs.saveChangedBlockInFile(block);
+                }
                 System.exit(0);
             }
         });
