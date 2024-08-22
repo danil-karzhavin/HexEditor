@@ -1,8 +1,8 @@
 package test;
 
 import HexTools.HexTools;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class HexToolsTest {
         checkLenSequence();
         for(int i = 0; i < testValuesInt.length; ++i){
             String res = HexTools.byteToHex(testValuesInt[i]);
-            Assertions.assertEquals(testValuesString[i], res);
+            Assert.assertEquals(testValuesString[i], res);
         }
     }
     @Test
@@ -28,7 +28,7 @@ public class HexToolsTest {
         checkLenSequence();
         for(int i = 0; i < testValuesString.length; ++i){
             int res = HexTools.hexStringToByte(testValuesString[i]);
-            Assertions.assertEquals(testValuesInt[i], res);
+            Assert.assertEquals(testValuesInt[i], res);
         }
     }
 
@@ -37,11 +37,11 @@ public class HexToolsTest {
         checkLenSequence();
         for(int i = 0; i < testValuesString.length; ++i){
             Boolean res = HexTools.isValidHexByte(testValuesString[i]);
-            Assertions.assertEquals(true, res);
+            Assert.assertEquals(true, res);
         }
         for(int i = 0; i< testIncorrectValuesString.length; ++i){
             Boolean res = HexTools.isValidHexByte((testIncorrectValuesString[i]));
-            Assertions.assertEquals(false, res);
+            Assert.assertEquals(false, res);
         }
     }
 
@@ -58,7 +58,7 @@ public class HexToolsTest {
         //String testIncorrectSequences[] = {"Hello", "1", "A"};
         for(int i = 0; i < testCorrectSequences.length; ++i){
             List<Integer> res = HexTools.stringToBytes(testCorrectSequences[i]);
-            Assertions.assertEquals(testExpectedSequences.get(i), res.toArray());
+            Assert.assertEquals(testExpectedSequences.get(i), res.toArray());
         }
 
     }
