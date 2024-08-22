@@ -31,7 +31,7 @@ public class PasteAction extends AbstractAction {
             // Извлекаем текст из буфера обмена
             try{
                 String text = (String) contents.getTransferData(DataFlavor.stringFlavor);
-                hexValues = HexTools.StringToBytes(text);
+                hexValues = HexTools.stringToBytes(text);
             }
             catch (UnsupportedFlavorException ex){}
             catch (IOException ex){}

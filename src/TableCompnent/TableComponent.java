@@ -33,6 +33,7 @@ public class TableComponent implements ITableComponent {
     public App app = null;
     public static int countLinesInBlock = 100;
     public static int countColumnsInBlock = 0;
+    public static int prevCountColumnsInBlock = 0;
     public String oldCellValue;
     int maxWidthRow = 0;
     // Модель столбцов таблицы
@@ -141,7 +142,7 @@ public class TableComponent implements ITableComponent {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try{
-                    if (sizeRows.getText() != null && sizeRows.getText() != ""){
+                    if (sizeRows.getText() != null && !sizeRows.getText().toString().isEmpty()){
                         int value = Integer.parseInt(sizeRows.getText());
                         if (value <= 0)
                            throw new NumberFormatException();
@@ -153,7 +154,7 @@ public class TableComponent implements ITableComponent {
                 }
 
                 try{
-                    if (sizeColumns.getText() != null && sizeColumns.getText() != ""){
+                    if (sizeColumns.getText() != null && !sizeColumns.getText().toString().isEmpty()){
                         int value = Integer.parseInt(sizeColumns.getText());
                         if (value <= 0)
                             throw new NumberFormatException();
@@ -207,8 +208,11 @@ public class TableComponent implements ITableComponent {
             maxWidthRow = fs.getMaxWidthRow(); // нельзя вызывать больше одного раза
             if (maxWidthRow <= countColumnsInBlock){
                 maxWidthRow = countColumnsInBlock;
+                prevCountColumnsInBlock = countColumnsInBlock;
             }
             else if (countColumnsInBlock != 0){
+                if (prevCountColumnsInBlock != 0)
+                    maxWidthRow = prevCountColumnsInBlock;
                 sizeColumns.setText("Значение не может быть меньше самой длинной строки в файле");
             }
 

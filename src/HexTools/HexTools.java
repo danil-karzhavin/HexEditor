@@ -1,7 +1,5 @@
 package HexTools;
 
-import FileService.FileService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,7 +17,7 @@ public class HexTools {
         }
         return hex.toUpperCase();  // Приводим к верхнему регистру для единства стиля
     }
-    public static List<Integer> StringToBytes(String hexString) {
+    public static List<Integer> stringToBytes(String hexString) {
         var hexValues = new ArrayList<Integer>();
 
         // Регулярное выражение для пары шестнадцатеричных символов
