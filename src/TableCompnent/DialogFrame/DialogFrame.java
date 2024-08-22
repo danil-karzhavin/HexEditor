@@ -6,6 +6,8 @@ import TableCompnent.TableComponent;
 
 import javax.swing.*;
 
+import HexTools.HexTools;
+
 public class DialogFrame {
     int row, col;
     public int[] bytes;
@@ -49,7 +51,7 @@ public class DialogFrame {
         for(int i = 0; i < 8; ++i, ++curCol){
             try{
                 String hex = data.get(curRow).get(curCol).toString();
-                int el = FileService.hexStringToByte(hex);
+                int el = HexTools.hexStringToByte(hex);
                 hexValues += hex + " ";
                 bytes[i] = el;
 

@@ -8,6 +8,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HexTools {
+    public static String byteToHex(int b) {
+        // & 0xFF преобразует байт к беззнаковому целому
+        // Метод toHexString преобразует это значение в шестнадцатеричную строку
+        String hex = Integer.toHexString(b & 0xFF);
+
+        // Проверяем длину строки и добавляем ведущий ноль, если это необходимо
+        if (hex.length() == 1) {
+            hex = "0" + hex;
+        }
+        return hex.toUpperCase();  // Приводим к верхнему регистру для единства стиля
+    }
     public static List<Integer> StringToBytes(String hexString) {
         var hexValues = new ArrayList<Integer>();
 
@@ -17,7 +28,7 @@ public class HexTools {
 
         // Поиск всех пар шестнадцатеричных символов
         while (matcher.find()) {
-            int b = FileService.hexStringToByte(matcher.group());
+            int b = hexStringToByte(matcher.group());
             hexValues.add(b);
         }
         return hexValues;

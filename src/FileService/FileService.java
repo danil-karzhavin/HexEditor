@@ -9,6 +9,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import HexTools.HexTools;
+
 public class FileService {
     public static String path;
     public App app;
@@ -28,31 +30,6 @@ public class FileService {
         this.path = path;
     }
 
-    public static String byteToHex(int b) {
-        // & 0xFF преобразует байт к беззнаковому целому
-        // Метод toHexString преобразует это значение в шестнадцатеричную строку
-        String hex = Integer.toHexString(b & 0xFF);
-
-        // Проверяем длину строки и добавляем ведущий ноль, если это необходимо
-        if (hex.length() == 1) {
-            hex = "0" + hex;
-        }
-        return hex.toUpperCase();  // Приводим к верхнему регистру для единства стиля
-    }
-
-    public static int hexStringToByte(String hexString) throws NumberFormatException {
-        if (hexString == null || hexString.length() != 2) {
-            throw new IllegalArgumentException("Строка должна содержать ровно 2 символа.");
-        }
-
-        // Преобразование шестнадцатеричной строки в int, а затем в byte
-        int intValue = Integer.parseInt(hexString, 16);
-
-        // Преобразование int в byte (обработка переполнения)
-        // Добавляем логическое "и" с 0xFF, чтобы избавиться от возможного знака
-        return (intValue & 0xFF);
-    }
-
     public void largeFileReader(){
         try{
             this.randomAccessFile = new RandomAccessFile(path, "r");
@@ -70,7 +47,7 @@ public class FileService {
             b = randomAccessFile.read();
             if (b == -1)
                 break;
-            String hexView = byteToHex(b);
+            String hexView = HexTools.byteToHex(b);
             oneLine.add(hexView);
         }
         while (b != '\n');
@@ -287,7 +264,7 @@ public class FileService {
                     b = fin.read();
                     countBytesInBlockFile += 1;
 
-                    if (hexStringToByte(el.toString()) != b){
+                    if (HexTools.hexStringToByte(el.toString()) != b){
                         block.changed = true;
                         block.startPosChanged = block.firstBytePos + countBytesInBlockFile;
                         return;
@@ -334,7 +311,7 @@ public class FileService {
                     if (el == null)
                         continue;
 
-                    int value = hexStringToByte(el.toString());
+                    int value = HexTools.hexStringToByte(el.toString());
                     fin.write(value);
                 }
             }

@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import HexTools.HexTools;
+
 public class TextSearchComponent {
     List<Integer> hexValues;
     //    List<SearchSubArray> positionsInFile;
@@ -101,7 +103,7 @@ public class TextSearchComponent {
 
         // Поиск всех пар шестнадцатеричных символов
         while (matcher.find()) {
-            int b = app.fs.hexStringToByte(matcher.group());
+            int b = HexTools.hexStringToByte(matcher.group());
             hexValues.add(b);
         }
         return hexValues;
