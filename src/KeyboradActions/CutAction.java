@@ -43,7 +43,7 @@ public class CutAction extends AbstractAction {
             }
 
 
-            System.out.println("Single cell selected at ()");
+            //System.out.println("Single cell selected at ()");
         } else if (selectedRows.length > 0 && selectedColumns.length > 0) {
             int firstRow = selectedRows[0];
             int endRow = selectedRows[selectedRows.length - 1];
@@ -54,10 +54,10 @@ public class CutAction extends AbstractAction {
 
             int startRowInFile = Integer.parseInt(table.tableModel.getDataVector().get(firstRow).get(0).toString()) - 1;
             int startColInFile = firstCol - 1;
-            int endRowInFile = Integer.parseInt(table.tableModel.getDataVector().get(endRow).get(0).toString()) - 1;
+            //int endRowInFile = Integer.parseInt(table.tableModel.getDataVector().get(endRow).get(0).toString()) - 1;
 
             int position = table.fs.getPositionByRowCol(startRowInFile, startColInFile);
-            int cutLength = table.tableModel.getLengthSelectBlock(startRowInFile, firstCol, endRowInFile, endCol);
+            int cutLength = table.tableModel.getLengthSelectBlock(firstRow, firstCol, endRow, endCol);
             table.fs.removeCutBytesInFile(position, cutLength);
 
             int blockPos = TableBlock.currentBlockPos;

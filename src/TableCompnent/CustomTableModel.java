@@ -35,29 +35,57 @@ public class CustomTableModel extends DefaultTableModel {
         var data = getDataVector();
         int countRes = 0;
 
-        if (startRow < endRow)
+        if (startRow == endRow){
+            for(int i = startRow; i <= startRow; ++i)
+                for(int j = startCol; j <= endCol; ++j){
+                    try{
+                        var el = data.get(i).get(j);
+                        if (el != null)
+                            countRes += 1;
+                    }
+                    catch (ArrayIndexOutOfBoundsException ex){
+                        return countRes;
+                    }
+                }
+        }
+        else{
             for(int i = startRow; i <= startRow; ++i)
                 for(int j = startCol; j < data.get(i).size(); ++j){
-                    var el = data.get(i).get(j);
-                    if (el != null)
-                        countRes += 1;
+                    try{
+                        var el = data.get(i).get(j);
+                        if (el != null)
+                            countRes += 1;
+                    }
+                    catch (ArrayIndexOutOfBoundsException ex){
+                        return countRes;
+                    }
                 }
 
 
-        for(int i = startRow + 1; i < endRow; ++i)
-            for(int j = 1; j < data.get(i).size(); ++j){
-                var el = data.get(i).get(j);
-                if (el != null)
-                    countRes += 1;
-            }
+            for(int i = startRow + 1; i < endRow; ++i)
+                for(int j = 1; j < data.get(i).size(); ++j){
+                    try{
+                        var el = data.get(i).get(j);
+                        if (el != null)
+                            countRes += 1;
+                    }
+                    catch (ArrayIndexOutOfBoundsException ex){
+                        return countRes;
+                    }
+                }
 
-        for(int i = endRow; i <= endRow; ++i)
-            for(int j = 1; j <= endCol; ++j){
-                var el = data.get(i).get(j);
-                if (el != null)
-                    countRes += 1;
-            }
-
+            for(int i = endRow; i <= endRow; ++i)
+                for(int j = 1; j <= endCol; ++j){
+                    try{
+                        var el = data.get(i).get(j);
+                        if (el != null)
+                            countRes += 1;
+                    }
+                    catch (ArrayIndexOutOfBoundsException ex){
+                        return countRes;
+                    }
+                }
+        }
         return countRes;
     }
 }
